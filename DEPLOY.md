@@ -53,10 +53,38 @@ Wait for SSL (usually a few minutes).
 
 ## 4. Google OAuth
 
-In Google Cloud Console, add to your OAuth web client:
+Open [Google Cloud Console → OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent).
 
-- **Origins:** `https://pyclips.in`, `https://www.pyclips.in`
-- **Redirect URIs:** `https://pyclips.in/api/auth/google/callback`
+### Fix “Error 403: org_internal”
+
+That error means the app is set to **Internal** (Workspace-only). PyClips needs **External** so any Google user can sign in.
+
+1. **OAuth consent screen** → **Edit app**
+2. **User type** → **External** (not Internal). Save.
+3. **Publishing status**
+   - **Testing** — add every email that should sign in under **Test users** (e.g. `pyclips.in@gmail.com`), then Save.
+   - **In production** — any Google account can sign in (Google may ask for verification if you request sensitive scopes; email/profile/openid are usually fine).
+
+### OAuth client (Web application)
+
+[Credentials](https://console.cloud.google.com/apis/credentials) → your **Web client** (same `GOOGLE_CLIENT_ID` as Railway):
+
+| Field | Values |
+|-------|--------|
+| **Authorized JavaScript origins** | `https://pyclips.in` · `http://127.0.0.1:8001` |
+| **Authorized redirect URIs** | `https://pyclips.in/api/auth/google/callback` · `http://127.0.0.1:8001/api/auth/google/callback` |
+
+Scopes used by the site: `openid`, `email`, `profile`.
+
+### Railway (already required)
+
+| Variable | Value |
+|----------|--------|
+| `PYCLIPS_PUBLIC_URL` | `https://pyclips.in` (must match redirect URI host) |
+| `GOOGLE_CLIENT_ID` | Web client id ending in `.apps.googleusercontent.com` |
+| `GOOGLE_CLIENT_SECRET` | Web client secret |
+
+After changing Google settings, wait ~1 minute and try **Sign in with Google** again in a private/incognito window.
 
 ## 5. Verify
 
