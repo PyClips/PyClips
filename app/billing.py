@@ -464,28 +464,19 @@ def _rzp_list_items(cfg: dict, path: str, params: dict | None = None, pages: int
 def _apply_rzp_subscription(user_id: int, cfg: dict, entity: dict) -> bool:
     if not isinstance(entity, dict):
         return False
-    status = str(entity.get("status") or "").lower()
     sub_id = str(entity.get("id") or "")
     kind = _kind_from_entity(entity, cfg)
     try:
         paid_count = int(entity.get("paid_count") or 0)
     except (TypeError, ValueError):
         paid_count = 0
+    # Never grant Premium for checkout-only subscriptions (created/authenticated/pending).
+    if paid_count < 1:
+        return False
     until = _unix_to_dt(entity.get("current_end"))
     now = _now()
     if until is None or until <= now:
-        paid_like = paid_count >= 1 or status in ("active", "authenticated", "pending", "created")
-        if not paid_like:
-            return False
-        start = (
-            _unix_to_dt(entity.get("current_start"))
-            or _unix_to_dt(entity.get("start_at"))
-            or _unix_to_dt(entity.get("charged_at"))
-            or now
-        )
-        until = start + timedelta(days=_plan_days(kind))
-        if until <= now:
-            until = now + timedelta(days=_plan_days(kind))
+        return False
     ok = ensure_premium_until(user_id, until, billing_plan=kind, sub_id=sub_id)
     if ok and sub_id:
         db.get_conn().execute("UPDATE users SET rzp_subscription_id = ? WHERE id = ?", (sub_id, user_id))
@@ -566,21 +557,31 @@ def _restore_from_razorpay(user_id: int) -> bool:
     if not row:
         return False
     email = str(row["email"] or "").strip()
+    sub_id = str(row["rzp_subscription_id"] or "").strip()
+    cust = str(row["rzp_customer_id"] or "").strip()
+    has_local_pay = db.get_conn().execute(
+        "SELECT 1 FROM payments WHERE user_id = ? LIMIT 1",
+        (user_id,),
+    ).fetchone()
+    # Skip Razorpay API scans for brand-new free accounts with no billing footprint.
+    if not sub_id and not cust and not has_local_pay:
+        return False
     try:
-        sub_id = str(row["rzp_subscription_id"] or "").strip()
         if sub_id:
             data = _rzp_get_json(cfg, f"/subscriptions/{sub_id}")
             if data and _apply_rzp_subscription(user_id, cfg, data):
                 return True
-        cust = _find_rzp_customer_id(cfg, email, str(row["rzp_customer_id"] or "").strip())
-        if cust and cust != str(row["rzp_customer_id"] or "").strip():
-            db.get_conn().execute("UPDATE users SET rzp_customer_id = ? WHERE id = ?", (cust, user_id))
-            db.get_conn().commit()
-        for entity in _rzp_list_items(cfg, "/subscriptions"):
-            if not _belongs_to_user(entity, user_id, email, cust):
-                continue
-            if _apply_rzp_subscription(user_id, cfg, entity):
-                return True
+        if not cust:
+            cust = _find_rzp_customer_id(cfg, email, "")
+            if cust:
+                db.get_conn().execute("UPDATE users SET rzp_customer_id = ? WHERE id = ?", (cust, user_id))
+                db.get_conn().commit()
+        if cust or sub_id or has_local_pay:
+            for entity in _rzp_list_items(cfg, "/subscriptions"):
+                if not _belongs_to_user(entity, user_id, email, cust):
+                    continue
+                if _apply_rzp_subscription(user_id, cfg, entity):
+                    return True
         paid_from = int((_now() - timedelta(days=40)).timestamp())
         for pay in _rzp_list_items(cfg, "/payments", {"from": paid_from}):
             if not _belongs_to_user(pay, user_id, email, cust):
@@ -590,6 +591,77 @@ def _restore_from_razorpay(user_id: int) -> bool:
     except requests.RequestException:
         logger.exception("Razorpay restore failed for user %s", user_id)
     return False
+
+
+def _premium_entitlement_active(user_id: int) -> bool:
+    """True when this account has proof of paid Premium (payment, coupon, or paid Razorpay sub)."""
+    conn = db.get_conn()
+    now = _now()
+    for pay in conn.execute(
+        "SELECT amount_paise, kind, created_at FROM payments WHERE user_id = ?",
+        (user_id,),
+    ):
+        start = auth.parse_until(pay["created_at"])
+        if not start:
+            continue
+        days, _kind = _days_for_amount(int(pay["amount_paise"] or 0), str(pay["kind"] or ""))
+        if start + timedelta(days=days) > now:
+            return True
+    coupons = db.load_coupons()
+    for red in conn.execute(
+        "SELECT code, created_at, days FROM coupon_redemptions WHERE user_id = ?",
+        (user_id,),
+    ):
+        start = auth.parse_until(red["created_at"])
+        if not start:
+            continue
+        stored_days = red["days"]
+        if stored_days not in (None, ""):
+            try:
+                days = max(1, int(stored_days))
+            except (TypeError, ValueError):
+                days = 0
+        else:
+            days = 0
+        if not days:
+            _stored, spec = find_coupon(coupons, str(red["code"] or ""))
+            days = coupon_days(spec) if spec is not None else MONTHLY_DAYS
+        if start + timedelta(days=days) > now:
+            return True
+    cfg = settings()
+    if _keys_ready(cfg):
+        row = conn.execute("SELECT rzp_subscription_id FROM users WHERE id = ?", (user_id,)).fetchone()
+        sub_id = str(row["rzp_subscription_id"] or "").strip() if row else ""
+        if sub_id:
+            data = _rzp_get_json(cfg, f"/subscriptions/{sub_id}")
+            if isinstance(data, dict):
+                try:
+                    paid_count = int(data.get("paid_count") or 0)
+                except (TypeError, ValueError):
+                    paid_count = 0
+                cur_end = _unix_to_dt(data.get("current_end"))
+                if paid_count >= 1 and cur_end and cur_end > now:
+                    return True
+    return False
+
+
+def _revoke_unpaid_premium(user_id: int) -> bool:
+    conn = db.get_conn()
+    row = conn.execute("SELECT plan, premium_until FROM users WHERE id = ?", (user_id,)).fetchone()
+    if not row or row["plan"] != "premium":
+        return False
+    until = auth.parse_until(row["premium_until"])
+    if until is None or until <= _now():
+        return False
+    if _premium_entitlement_active(user_id):
+        return False
+    conn.execute(
+        "UPDATE users SET plan = 'free', billing_plan = NULL, premium_until = NULL WHERE id = ?",
+        (user_id,),
+    )
+    conn.commit()
+    logger.info("Revoked unpaid Premium for user %s", user_id)
+    return True
 
 
 def repair_premium(user_id: int) -> bool:
@@ -610,6 +682,9 @@ def repair_premium(user_id: int) -> bool:
     until = auth.parse_until(row["premium_until"])
     now = _now()
     if until and until > now:
+        if row["plan"] == "premium" and not _premium_entitlement_active(uid):
+            _revoke_unpaid_premium(uid)
+            return True
         if row["plan"] != "premium":
             conn.execute("UPDATE users SET plan = 'premium' WHERE id = ?", (uid,))
             conn.commit()
@@ -909,10 +984,16 @@ def apply_webhook(body: bytes, signature: str) -> dict:
             pass
     paid_events = (
         "subscription.charged",
-        "subscription.activated",
         "payment.captured",
     )
     if event in paid_events:
+        if event == "subscription.charged":
+            try:
+                paid_count = int(sub_ent.get("paid_count") or 0)
+            except (TypeError, ValueError):
+                paid_count = 0
+            if paid_count < 1:
+                return {"status": "ignored", "event": event, "reason": "unpaid_subscription"}
         grant_premium(
             user_id,
             days=days,
