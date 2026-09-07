@@ -264,8 +264,8 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
     if (!enabled) {
       setMsg(
         currency === "USD"
-          ? "International USD plans are not configured yet. Enable Razorpay International, create USD plans, and set RAZORPAY_PLAN_MONTHLY_USD / YEARLY_USD."
-          : "Razorpay is not configured on Railway yet. Add RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, and both INR plan ids, then redeploy."
+          ? ""
+          : ""
       );
       return;
     }
@@ -375,8 +375,8 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
       {!paymentsOk && (
         <p className="error">
           {isUsd
-            ? "International USD plans are not configured yet. Enable Razorpay International and set RAZORPAY_PLAN_MONTHLY_USD / YEARLY_USD."
-            : "Razorpay is not configured on Railway yet. Add RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, and both INR plan ids, then redeploy."}
+            ? ""
+            : ""}
         </p>
       )}
       <LegalFooter />
