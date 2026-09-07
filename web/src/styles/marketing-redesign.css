@@ -1,0 +1,148 @@
+/* PyClips marketing — desktop-native positioning */
+
+:root {
+  --video-ink: #0b0d10;
+  --timeline: #ffb020;
+  --caption: #f2f4f7;
+}
+
+body {
+  background:
+    radial-gradient(900px 520px at 100% -10%, rgba(124, 92, 255, 0.1), transparent 58%),
+    radial-gradient(700px 480px at 0% 20%, rgba(255, 176, 32, 0.05), transparent 55%),
+    var(--bg);
+}
+
+.landing-nav {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+}
+
+.landing-hero {
+  padding-top: 48px;
+}
+
+.landing-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.landing-eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(124, 92, 255, 0.55);
+}
+
+.landing-hero h1 span {
+  color: var(--accent);
+}
+
+.landing-trust {
+  list-style: none;
+  margin: 18px auto 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 720px;
+}
+
+.landing-trust li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.landing-trust li::before {
+  content: "▶";
+  font-size: 9px;
+  color: var(--timeline);
+}
+
+.landing-meta {
+  margin-top: 14px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.landing-strip h2 {
+  font-size: 1.15rem;
+  max-width: 28ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.landing-pills li {
+  border-color: color-mix(in srgb, var(--accent) 24%, var(--line-2));
+}
+
+.landing-shot {
+  border: 1px solid var(--line-2);
+  box-shadow:
+    0 30px 80px -40px rgba(0, 0, 0, 0.85),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.landing-shot img {
+  display: block;
+}
+
+.landing-final {
+  border: 1px solid var(--line-2);
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(124, 92, 255, 0.12), transparent 55%),
+    var(--surface);
+}
+
+/* App pages — match landing polish */
+.page {
+  max-width: 680px;
+  padding-top: 28px;
+}
+
+.page .top {
+  margin-bottom: 18px;
+}
+
+.page .auth-screen,
+.page .auth-card {
+  box-shadow: var(--shadow-md);
+}
+
+.page .landing-title {
+  font-size: 28px;
+}
+
+.page .plans {
+  gap: 14px;
+}
+
+.plan-card {
+  transition: transform 0.15s var(--ease), border-color 0.15s;
+}
+
+.plan-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+}

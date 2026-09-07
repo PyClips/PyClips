@@ -1,0 +1,62 @@
+.pc-frame {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 12px;
+}
+
+.pc-frame--full {
+  display: flex;
+  width: 100%;
+}
+
+.pc-frame--lg {
+  border-radius: 14px;
+}
+
+.pc-frame--sm {
+  border-radius: 10px;
+}
+
+.pc-frame--primary {
+  background: var(--accent);
+  box-shadow: 0 8px 22px -12px rgba(124, 92, 255, 0.55);
+}
+
+.pc-frame--store,
+.pc-frame--ghost,
+.pc-frame--card {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+}
+
+.pc-frame--card {
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.pc-frame > * {
+  border-radius: inherit;
+}
+
+.pc-frame--primary > .btn,
+.pc-frame--primary > .landing-btn,
+.pc-frame--primary > a.landing-btn {
+  border: 0;
+  background: transparent;
+  color: var(--accent-ink);
+}
+
+.pc-frame--ghost > .btn,
+.pc-frame--ghost > .landing-btn,
+.pc-frame--store > .btn,
+.pc-frame--store > .landing-btn {
+  background: transparent;
+  border: 0;
+}
+
+.pc-frame--full > .btn,
+.pc-frame--full > .landing-btn,
+.pc-frame--full > a.landing-btn,
+.pc-frame--full > button {
+  width: 100%;
+}

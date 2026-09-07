@@ -1,0 +1,66 @@
+/* Raster PyClips logo — no legacy purple tile behind the mark */
+
+.brand-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 22%;
+  filter: drop-shadow(0 10px 28px rgba(124, 92, 255, 0.32));
+}
+
+.brand-mark,
+.landing-mark,
+.auth-stitch__mark {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  overflow: visible;
+  display: grid;
+  place-items: center;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  color: inherit;
+}
+
+.brand-mark .brand-logo,
+.landing-mark .brand-logo,
+.auth-stitch__mark .brand-logo {
+  width: var(--brand-logo-size, 36px);
+  height: var(--brand-logo-size, 36px);
+}
+
+.brand-hero .brand-mark {
+  --brand-logo-size: 90px;
+}
+
+.brand-mark.sm {
+  --brand-logo-size: 40px;
+}
+
+.auth-stitch__mark {
+  --brand-logo-size: 28px;
+}
+
+.landing-mark {
+  --brand-logo-size: 34px;
+}
+
+.landing-mark.sm {
+  --brand-logo-size: 28px;
+}
+
+.brand-hero .brand-mark .brand-logo {
+  filter: drop-shadow(0 18px 44px rgba(124, 92, 255, 0.4));
+}
+
+.landing-mark .brand-logo {
+  filter: drop-shadow(0 8px 20px rgba(124, 92, 255, 0.3));
+}
+
+.auth-stitch__mark .brand-logo {
+  filter: drop-shadow(0 6px 16px rgba(124, 92, 255, 0.28));
+}

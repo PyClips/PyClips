@@ -1,0 +1,27 @@
+PyClips includes or depends on third-party software. Those components keep
+their original licenses. This file is an attribution list, not a license for
+PyClips itself. PyClips source is proprietary (see LICENSE).
+
+FastAPI — MIT License — https://github.com/fastapi/fastapi
+Starlette — BSD-3-Clause — https://github.com/encode/starlette
+Uvicorn — BSD-3-Clause — https://github.com/encode/uvicorn
+Pydantic — MIT License — https://github.com/pydantic/pydantic
+yt-dlp — Unlicense — https://github.com/yt-dlp/yt-dlp
+faster-whisper — MIT License — https://github.com/SYSTRAN/faster-whisper
+CTranslate2 — MIT License — https://github.com/OpenNMT/CTranslate2
+requests — Apache License 2.0 — https://github.com/psf/requests
+indic-transliteration — MIT License
+React — MIT License — https://github.com/facebook/react
+Vite — MIT License — https://github.com/vitejs/vite
+FFmpeg — LGPL/GPL depending on the build you ship — https://ffmpeg.org
+pywebview — BSD-3-Clause — https://github.com/r0x0r/pywebview
+Hugging Face Hub — Apache License 2.0
+Roboto font — Apache License 2.0 — https://github.com/googlefonts/roboto-2
+
+python-multipart — Apache License 2.0
+SQLite — Public Domain (via Python standard library / bundled runtime)
+Razorpay — https://razorpay.com/terms/ (website billing integration)
+Google OAuth — https://developers.google.com/terms (website sign-in)
+
+If you ship a bundled Python runtime, include the licenses from that
+interpreter and its site-packages alongside this file.

@@ -1,0 +1,6 @@
+.env
+data/*.db
+data/*.db-*
+data/*.secret
+data/coupons.json
+web/node_modules

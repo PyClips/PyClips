@@ -1,0 +1,12 @@
+.git
+**/.git
+**/__pycache__
+**/*.pyc
+**/*.pyo
+web/node_modules
+web/dist
+.env
+data/*.db
+data/*.db-*
+data/*.secret
+data/coupons.json
