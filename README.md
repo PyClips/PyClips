@@ -11,7 +11,7 @@ The Windows desktop clip editor is **not** in this repository.
 
 PyClips is **proprietary software**. All rights reserved — see [LICENSE](LICENSE).
 
-Third-party libraries are listed in [NOTICE](NOTICE).
+Third-party libraries are listed in [NOTICE](NOTICE) and [docs/THIRD_PARTY_LICENSES.md](docs/THIRD_PARTY_LICENSES.md). Provenance: [docs/PROVENANCE.md](docs/PROVENANCE.md).
 
 ## Local run
 
