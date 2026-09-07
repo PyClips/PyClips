@@ -6,5 +6,5 @@ export const SITE_URL = "https://pyclips.in";
 
 export const SOCIALS = [
   { label: "X", href: "https://x.com/Py_Clips" },
-  { label: "GitHub", href: "https://github.com/PyClips/PyClips" },
+  { label: "GitHub", href: "https://github.com/PyClips" },
 ];
