@@ -60,7 +60,7 @@ function Privacy() {
         <h2>Who we are</h2>
         <p>
           PyClips is a desktop video clipping app plus this website at <a href="https://pyclips.in">pyclips.in</a>.
-          Clip rendering and transcription run on your computer. This website is only for accounts, Premium, and redeem codes.
+          Clip rendering and transcription run in the Windows app. This website is for accounts, Premium, and redeem codes.
         </p>
       </div>
 
@@ -110,10 +110,8 @@ function Privacy() {
       <div className="card">
         <h2>Desktop app and your videos</h2>
         <p>
-          Source videos, transcripts, and exported clips stay on your PC (for example in the PyClips folder under AppData).
-          They are not uploaded to pyclips.in. The desktop app may send your email, clip usage count, and a sync token
-          to this website so Premium and free-tier limits stay in sync. If you paste a YouTube link, the download happens
-          on your machine.
+          Source videos, transcripts, and exported clips are handled in the desktop app, not stored on pyclips.in.
+          The app may send your email, clip usage count, and a sync token to this website so Premium and free-tier limits stay in sync.
         </p>
       </div>
 
@@ -121,7 +119,7 @@ function Privacy() {
         <h2>Cookies and logs</h2>
         <p>
           This website uses an http-only session cookie to keep you signed in, and a short-lived admin cookie for the
-          internal redeem-code page. The desktop app may write log files on your computer for crashes and download errors.
+          internal redeem-code page. The desktop app may write log files for crashes and download errors.
           We do not run advertising trackers on this site.
         </p>
       </div>
@@ -197,7 +195,7 @@ function Account({ user, sub, setSub, setUser }) {
         )}
         <p className="note">
           Free accounts can generate 10 clips (lifetime; deleting a clip does not restore a slot).
-          Premium uses Razorpay autopay — INR in India, USD elsewhere (Razorpay International). Clip files stay on your PC.
+          Premium uses Razorpay autopay — INR in India, USD elsewhere (Razorpay International).
         </p>
         <div className="plan-row">
           <SurfaceFrame variant="primary" full>
@@ -264,8 +262,8 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
     if (!enabled) {
       setMsg(
         currency === "USD"
-          ? ""
-          : ""
+          ? "International USD plans are not configured yet. Enable Razorpay International, create USD plans, and set RAZORPAY_PLAN_MONTHLY_USD / YEARLY_USD."
+          : "Razorpay is not configured on Railway yet. Add RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, and both INR plan ids, then redeploy."
       );
       return;
     }
@@ -375,8 +373,8 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
       {!paymentsOk && (
         <p className="error">
           {isUsd
-            ? ""
-            : ""}
+            ? "International USD plans are not configured yet. Enable Razorpay International and set RAZORPAY_PLAN_MONTHLY_USD / YEARLY_USD."
+            : "Razorpay is not configured on Railway yet. Add RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, and both INR plan ids, then redeploy."}
         </p>
       )}
       <LegalFooter />

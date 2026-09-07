@@ -83,7 +83,7 @@ function Shot({ src, alt, eager = false }) {
 const FAQS = [
   {
     q: "What is PyClips?",
-    a: "PyClips is a Windows desktop app that turns videos into captioned short-form clips. It finds moments, burns styled captions, reframes for social sizes, and renders on your PC.",
+    a: "PyClips is a Windows desktop app that turns videos into captioned short-form clips. It finds moments, burns styled captions, reframes for social sizes, and exports MP4s.",
   },
   {
     q: "How do I install PyClips?",
@@ -91,7 +91,7 @@ const FAQS = [
   },
   {
     q: "Can I use my own videos?",
-    a: "Yes. Drop in a file from your computer, or paste a supported video/YouTube link where that path is enabled in the app.",
+    a: "Yes. Drop in a video file, or paste a supported YouTube link where that path is enabled in the app.",
   },
   {
     q: "Does PyClips support vertical videos?",
@@ -107,7 +107,7 @@ const FAQS = [
   },
   {
     q: "Where are my exported clips saved?",
-    a: "Finished clips are saved on your computer (for example in the PyClips folder under AppData). They are not hosted on pyclips.in.",
+    a: "Finished clips are saved to your PyClips Downloads folder.",
   },
   {
     q: "Is there a free version?",
@@ -354,8 +354,8 @@ export default function Landing({ user }) {
             <span>captioned vertical clips.</span>
           </h1>
           <p className="landing-lead">
-            Import once on your PC. finds strong moments, reframes for 9:16,
-            and burns styled captions — exports stay on your machine.
+            Import a video, find strong moments, reframe for 9:16,
+            and burn styled captions ready to post.
           </p>
           <div className="landing-hero-ctas">
             <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary landing-btn-lg">
@@ -366,8 +366,8 @@ export default function Landing({ user }) {
             </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">
-            <li>Runs on your PC</li>
-            <li>Local export folder</li>
+            <li>Windows app</li>
+            <li>Styled captions</li>
             <li>GPU optional</li>
             <li>10 free clips</li>
           </ul>
