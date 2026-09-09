@@ -13,20 +13,13 @@ PyClips is **proprietary software**. All rights reserved — see [LICENSE](LICEN
 
 Third-party libraries are listed in [NOTICE](NOTICE) and [docs/THIRD_PARTY_LICENSES.md](docs/THIRD_PARTY_LICENSES.md). Provenance: [docs/PROVENANCE.md](docs/PROVENANCE.md).
 
-## Local run
+## About PyClips
 
-```powershell
-copy .env.example .env
-cd web
-npm install
-npm run build
-cd ..
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8001
-```
+PyClips turns long videos into captioned short-form clips. Paste a link or drop a file, pick a look, and export vertical, square, or landscape MP4s ready for Reels, Shorts, and TikTok.
 
-Open http://127.0.0.1:8001
+The desktop app finds moments, burns styled captions, reframes the shot, and lets you add effects and music before you download. Accounts and Premium live on the web at [pyclips.in](https://pyclips.in) — sign in with Google, then use the same account in the Windows app.
 
-## Deploy (pyclips.in)
+**Free** includes a limited number of clips. **Premium** unlocks unlimited generations and the full caption library. India is billed in INR (₹29 / month or ₹199 / year). Elsewhere is billed in USD ($2.99 / month or $29.99 / year) through Razorpay.
 
-See [DEPLOY.md](DEPLOY.md) — Railway Docker deploy + custom domain + env vars.
+- Website: [pyclips.in](https://pyclips.in)
+- X: [x.com/Py_Clips](https://x.com/Py_Clips)
