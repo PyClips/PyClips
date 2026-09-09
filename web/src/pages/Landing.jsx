@@ -74,6 +74,7 @@ function Shot({ src, alt, eager = false }) {
     <figure className="landing-shot">
       <div className="landing-shot-bar" aria-hidden="true">
         <i /><i /><i />
+        <span>Product shot</span>
       </div>
       <img src={src} alt={alt} width="1280" height="700" loading={eager ? "eager" : "lazy"} decoding="async" />
     </figure>
@@ -291,7 +292,7 @@ export default function Landing({ user }) {
   }
 
   return (
-    <div className="landing" ref={pageRef}>
+    <div className="landing landing-stitch" ref={pageRef}>
       <header className="landing-nav">
         <a className="landing-brand" href="/">
           <span className="landing-mark"><Bolt size={20} /></span>
@@ -362,7 +363,7 @@ export default function Landing({ user }) {
               Download PyClips
             </ExternalCta>
             <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
-              Get it from Microsoft Store
+              Microsoft Store
             </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">
@@ -371,7 +372,6 @@ export default function Landing({ user }) {
             <li>GPU optional</li>
             <li>10 free clips</li>
           </ul>
-          <p className="landing-meta"></p>
           <div className="landing-hero-visual">
             <Shot
               src="/screenshots/dashboard.webp"
@@ -382,13 +382,26 @@ export default function Landing({ user }) {
         </section>
 
         <section className="landing-strip reveal" aria-label="Highlights">
-          <h2>Built for creators who edit on Windows — not in the browser.</h2>
+          <h2>Built for creators.</h2>
           <ul className="landing-pills">
-            <li></li>
-            <li>Caption style library</li>
-            <li>Manual reframe keyframes</li>
-            <li></li>
-            <li>Music ducking</li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+              Caption style library
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+              Manual reframe keyframes
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+              Music ducking
+            </li>
           </ul>
         </section>
 
@@ -397,19 +410,28 @@ export default function Landing({ user }) {
           <p className="landing-subhead">PyClips handles the repetitive editing work so you can focus on the content.</p>
           <div className="landing-stages">
             <article>
-              <span>01</span>
+              <div className="landing-stage-top">
+                <span>01</span>
+                <em>Source</em>
+              </div>
               <h3>Import</h3>
               <p>Drop in a video or paste a supported link.</p>
               <Shot src="/screenshots/create.webp" alt="PyClips create screen with upload and paste-link bar" />
             </article>
             <article>
-              <span>02</span>
+              <div className="landing-stage-top">
+                <span>02</span>
+                <em>Customization</em>
+              </div>
               <h3>Style</h3>
               <p>Choose captions, framing, effects and music.</p>
               <Shot src="/screenshots/captions.webp" alt="PyClips caption style picker beside a phone preview" />
             </article>
             <article>
-              <span>03</span>
+              <div className="landing-stage-top">
+                <span>03</span>
+                <em>Output</em>
+              </div>
               <h3>Export</h3>
               <p>Render a polished short ready to post.</p>
               <Shot src="/screenshots/library.webp" alt="PyClips library with a finished vertical clip" />
@@ -419,6 +441,7 @@ export default function Landing({ user }) {
 
         <section className="landing-split reveal" id="features">
           <div>
+            <p className="landing-kicker">Captions</p>
             <h2>Captions that look like they belong on your feed.</h2>
             <p>
               Choose from a growing library of short-form caption styles, then customize them to match your content.
@@ -436,6 +459,7 @@ export default function Landing({ user }) {
 
         <section className="landing-split landing-split-rev reveal">
           <div>
+            <p className="landing-kicker">Framing</p>
             <h2>Turn landscape footage into vertical content.</h2>
             <p>
               Reframe your footage for 9:16, 16:9 or 1:1 without manually rebuilding every shot.
@@ -452,6 +476,7 @@ export default function Landing({ user }) {
 
         <section className="landing-split reveal">
           <div>
+            <p className="landing-kicker">Music</p>
             <h2>Give every clip more energy.</h2>
             <p>
               Add background music, control volume, duck music under speech, and line tracks up with the beat.
@@ -466,8 +491,9 @@ export default function Landing({ user }) {
           <Shot src="/screenshots/add.webp" alt="PyClips editor with clip preview and workflow steps" />
         </section>
 
-        <section className="landing-block reveal">
+        <section className="landing-block landing-flow-block reveal">
           <h2>One workflow. No editing headache.</h2>
+          <p className="landing-subhead">Import, caption, reframe, mix music, and export from one Windows app.</p>
           <ol className="landing-flow">
             <li>Import</li>
             <li>Transcribe</li>
@@ -482,9 +508,13 @@ export default function Landing({ user }) {
 
         <section className="landing-block reveal" id="pricing">
           <h2>Start creating with PyClips.</h2>
+          <p className="landing-subhead">India: ₹29 / month or ₹199 / year. Outside India: $2.99 / month or $29.99 / year.</p>
           <div className="landing-plans">
             <article className="landing-plan">
-              <p className="landing-plan-name">Free</p>
+              <div className="landing-plan-head">
+                <p className="landing-plan-name">Free</p>
+                <em>Starter</em>
+              </div>
               <p className="landing-plan-price">{pricing?.currency === "USD" ? "$0" : "₹0"}</p>
               <p className="landing-plan-meta">10 lifetime generated clips</p>
               <ul>
@@ -492,14 +522,21 @@ export default function Landing({ user }) {
                 <li>Basic editing</li>
                 <li>GPU acceleration</li>
               </ul>
+              <p className="landing-note">Deleting a clip does not restore a slot.</p>
               <ExternalCta url={exeUrl} className="landing-btn landing-btn-ghost landing-btn-full">
                 Download PyClips
               </ExternalCta>
             </article>
             <article className="landing-plan landing-plan-hi">
-              <p className="landing-plan-name">Premium</p>
+              <div className="landing-plan-head">
+                <p className="landing-plan-name">Premium</p>
+                <em>Premium</em>
+              </div>
               <p className="landing-plan-price">{pricing?.monthly_display || "₹29"} <small>/ month</small></p>
               <p className="landing-plan-meta">or {pricing?.yearly_display || "₹199"} / year</p>
+              {pricing?.currency !== "USD" && (
+                <p className="landing-note">Outside India: $2.99 / month or $29.99 / year</p>
+              )}
               <ul>
                 <li>Unlimited generations</li>
                 <li>All caption styles</li>
@@ -514,10 +551,16 @@ export default function Landing({ user }) {
           </div>
         </section>
 
-        <section className="landing-block reveal" id="download">
+        <section className="landing-block landing-dl-block reveal" id="download">
           <h2>Get PyClips on Windows.</h2>
+          <p className="landing-meta">Windows 10 / Windows 11</p>
           <div className="landing-dl">
             <article>
+              <span className="landing-dl-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </span>
               <h3>Direct download</h3>
               <p>{exeUrl ? "Windows installer (.exe). Click to start the download." : "The Windows installer will be available here when it is released."}</p>
               <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary">
@@ -525,6 +568,9 @@ export default function Landing({ user }) {
               </ExternalCta>
             </article>
             <article>
+              <span className="landing-dl-ico landing-dl-ico-ms" aria-hidden="true">
+                <MicrosoftMark size={18} />
+              </span>
               <h3>Microsoft Store</h3>
               <p>Install PyClips from the Microsoft Store on Windows 10 and Windows 11.</p>
               <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store">
@@ -532,11 +578,11 @@ export default function Landing({ user }) {
               </ExternalCta>
             </article>
           </div>
-          <p className="landing-meta">Windows 10 / Windows 11</p>
         </section>
 
-        <section className="landing-block reveal" id="faq">
-          <h2>Questions</h2>
+        <section className="landing-block landing-faq-block reveal" id="faq">
+          <h2>Frequently asked questions</h2>
+          <p className="landing-subhead">How PyClips works on Windows, billing, and the free tier.</p>
           <div className="landing-faq">
             {FAQS.map((item) => (
               <details key={item.q} className="landing-faq-item">
@@ -582,7 +628,7 @@ export default function Landing({ user }) {
             <a key={s.label} href={s.href} target="_blank" rel="noreferrer">{s.label}</a>
           ))}
         </div>
-        <p className="landing-copy">© 2026 PyClips. All rights reserved.</p>
+        <p className="landing-copy">© 2026 PyClips. All rights reserved. <span>pyclips.in</span></p>
       </footer>
     </div>
   );

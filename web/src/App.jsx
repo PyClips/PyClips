@@ -150,6 +150,12 @@ function Account({ user, sub, setSub, setUser }) {
   const used = sub?.videos_used ?? 0;
   const limit = sub?.videos_limit;
   const usageLabel = premium || limit == null ? `${used} clips generated` : `${used} / ${limit} clips generated`;
+  const showTest = Boolean(sub?.test_mode && sub?.payments_enabled);
+  const msgOk = msg === "Code applied. Premium is active.";
+
+  useEffect(() => {
+    document.title = "Account · PyClips";
+  }, []);
 
   async function redeem(e) {
     e.preventDefault();
@@ -174,43 +180,100 @@ function Account({ user, sub, setSub, setUser }) {
   }
 
   return (
-    <div className="page">
-      <header className="top">
+    <div className="account-studio">
+      <header className="account-studio__nav">
         <BrandHome />
-        <SurfaceFrame variant="ghost" size="sm">
-          <button type="button" className="btn btn-ghost" onClick={logout}>Log out</button>
-        </SurfaceFrame>
+        <button type="button" className="account-studio__logout" onClick={logout}>
+          Log out
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
       </header>
-      <div className="card">
-        <h2>Account</h2>
-        <div className="row"><span>Username</span><b>{user.username}</b></div>
-        <div className="row"><span>Email</span><b>{user.email}</b></div>
-      </div>
-      <div className="card">
-        <h2>Subscription</h2>
-        <div className="row"><span>Plan</span><b>{premium ? "Premium" : "Free"}{sub?.test_mode && sub?.payments_enabled ? " · test" : ""}</b></div>
-        <div className="row"><span>Usage</span><b>{usageLabel}</b></div>
-        {premium && sub.premium_until && (
-          <div className="row"><span>Active until</span><b>{untilLabel(sub.premium_until)}{sub.days_left != null ? ` · ${sub.days_left}d left` : ""}</b></div>
-        )}
-        <p className="note">
-          Free accounts can generate 10 clips (lifetime; deleting a clip does not restore a slot).
-          Premium uses Razorpay autopay — INR in India, USD elsewhere (Razorpay International).
-        </p>
-        <div className="plan-row">
-          <SurfaceFrame variant="primary" full>
-            <a className="btn btn-primary" href="/pay">Purchase Premium</a>
-          </SurfaceFrame>
-        </div>
-        <form onSubmit={redeem} className="redeem">
-          <input className="auth-input" placeholder="Have a code?" value={code} onChange={(e) => setCode(e.target.value)} />
-          <SurfaceFrame variant="ghost" size="sm">
-            <button className="btn btn-ghost" type="submit" disabled={busy || !code.trim()}>Redeem</button>
-          </SurfaceFrame>
-        </form>
-        {msg && <p className="note">{msg}</p>}
-      </div>
-      <LegalFooter />
+
+      <main className="account-studio__main">
+        <section className="account-studio__card" aria-labelledby="account-heading">
+          <h2 id="account-heading">Account</h2>
+          <div className="account-studio__rows">
+            <div className="account-studio__row">
+              <span>Username</span>
+              <b>{user.username}</b>
+            </div>
+            <div className="account-studio__row">
+              <span>Email</span>
+              <b>{user.email}</b>
+            </div>
+          </div>
+        </section>
+
+        <section className="account-studio__card" aria-labelledby="sub-heading">
+          <h2 id="sub-heading">Subscription</h2>
+          <div className="account-studio__rows">
+            <div className="account-studio__row">
+              <span>Plan</span>
+              <b className="account-studio__pills">
+                <em className={"account-studio__pill" + (premium ? " is-premium" : "")}>
+                  {premium ? "Premium" : "Free"}
+                </em>
+                {showTest ? <em className="account-studio__pill is-test">test</em> : null}
+              </b>
+            </div>
+            <div className="account-studio__row">
+              <span>Usage</span>
+              <b>{usageLabel}</b>
+            </div>
+            {premium && sub.premium_until && (
+              <div className="account-studio__row">
+                <span>Active until</span>
+                <b>{untilLabel(sub.premium_until)}{sub.days_left != null ? ` · ${sub.days_left}d left` : ""}</b>
+              </div>
+            )}
+          </div>
+
+          <p className="account-studio__note">
+            Free accounts can generate 10 clips (lifetime; deleting a clip does not restore a slot).
+            Premium uses Razorpay autopay — INR in India, USD elsewhere (Razorpay International).
+          </p>
+
+          <a className="account-studio__pay" href="/pay">
+            Purchase Premium
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+
+          <div className="account-studio__divider" />
+
+          <form className="account-studio__redeem" onSubmit={redeem}>
+            <span className="account-studio__redeem-label">Redeem code</span>
+            <div className="account-studio__redeem-row">
+              <input
+                className="account-studio__input"
+                placeholder="Have a code?"
+                value={code}
+                autoComplete="off"
+                spellCheck="false"
+                onChange={(e) => { setCode(e.target.value); setMsg(""); }}
+              />
+              <button type="submit" disabled={busy || !code.trim()}>
+                {busy ? "Please wait…" : "Redeem"}
+              </button>
+            </div>
+            {msg ? (
+              <p className={"account-studio__msg" + (msgOk ? " is-ok" : " is-err")}>{msg}</p>
+            ) : null}
+          </form>
+        </section>
+      </main>
+
+      <footer className="account-studio__foot">
+        <span>© 2026 PyClips</span>
+        <span aria-hidden="true">·</span>
+        <a href="/privacy">Privacy</a>
+      </footer>
     </div>
   );
 }
@@ -245,6 +308,10 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
 
   useEffect(() => {
     loadRazorpay().catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    document.title = "Purchase Premium · PyClips";
   }, []);
 
   useEffect(() => {
@@ -320,64 +387,133 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
     ? Boolean(pricing?.razorpay_intl_enabled ?? pricing?.payments_enabled)
     : Boolean(pricing?.razorpay_enabled ?? pricing?.payments_enabled ?? sub?.payments_enabled);
 
+  const currencyHref = `/pay?currency=${isUsd ? "INR" : "USD"}${ticket ? `&ticket=${encodeURIComponent(ticket)}` : ""}`;
+  const monthlyHi = !premium && defaultPlan === "monthly";
+  const yearlyHi = !premium && defaultPlan === "yearly";
+  const monthlyActive = premium && billingPlan === "monthly";
+  const yearlyActive = premium && billingPlan === "yearly";
+  const statusOk = Boolean(msg) && msg.startsWith("Premium is active");
+  const statusBusy = Boolean(msg) && msg.startsWith("Opening");
+
   return (
-    <div className="page">
-      <header className="top">
+    <div className="pay-studio">
+      <header className="pay-studio__nav">
         <BrandHome />
-        <span className="muted">{user.email}</span>
+        <div className="pay-studio__email">
+          <span className="pay-studio__dot" aria-hidden="true" />
+          <span>{user.email}</span>
+        </div>
       </header>
-      <h1 className="landing-title">Purchase Premium</h1>
-      <p className="landing-sub">
-        {isUsd
-          ? "Autopay via Razorpay International (USD). Cancel anytime from Razorpay or your card issuer."
-          : "Autopay via Razorpay (INR). Cancel anytime from Razorpay or your bank mandate."}
-        {" "}
-        <a href={`/pay?currency=${isUsd ? "INR" : "USD"}${ticket ? `&ticket=${encodeURIComponent(ticket)}` : ""}`} style={{ color: "inherit", textDecoration: "underline" }}>
-          Show {isUsd ? "₹ INR" : "$ USD"} prices
-        </a>
-      </p>
-      {lockedEmail && user.email && lockedEmail !== user.email && (
-        <p className="error">This purchase was started in PyClips as <b>{lockedEmail}</b>. Log out and sign in with that email.</p>
-      )}
-      <div className="plans">
-        <SurfaceFrame variant="card" size="lg" full>
-          <button
-            type="button"
-            className={"plan-card" + (premium ? " locked" : "") + (!premium && defaultPlan === "monthly" ? " hi" : "") + (premium && billingPlan === "monthly" ? " current" : "")}
-            disabled={busy || premium}
-            onClick={() => buy("monthly")}
-          >
-            <div className="plan-name">Monthly{premium && billingPlan === "monthly" ? " · active" : ""}</div>
-            <div className="plan-price">{monthlyPrice}</div>
-            <div className="plan-meta">{premium ? "Unavailable" : busy ? "Please wait…" : "per month · autopay"}</div>
-          </button>
-        </SurfaceFrame>
-        <SurfaceFrame variant="card" size="lg" full>
-          <button
-            type="button"
-            className={"plan-card" + (premium ? " locked" : "") + (!premium && defaultPlan === "yearly" ? " hi" : "") + (premium && billingPlan === "yearly" ? " current" : "")}
-            disabled={busy || premium}
-            onClick={() => buy("yearly")}
-          >
-            <div className="plan-name">Yearly{premium && billingPlan === "yearly" ? " · active" : ""}</div>
-            <div className="plan-price">{yearlyPrice}</div>
-            <div className="plan-meta">{premium ? "Unavailable" : busy ? "Please wait…" : isUsd ? "per year · autopay" : "per year · autopay · 2 months free"}</div>
-          </button>
-        </SurfaceFrame>
-      </div>
-      {msg && (
-        <p className={msg.startsWith("Premium is active") || msg.startsWith("Opening") ? "note" : "error"} style={{ textAlign: "center", marginTop: 18 }}>
-          {msg}
-        </p>
-      )}
-      {!paymentsOk && (
-        <p className="error">
-          {isUsd
-            ? "International USD plans are not configured yet. Enable Razorpay International and set RAZORPAY_PLAN_MONTHLY_USD / YEARLY_USD."
-            : "Razorpay is not configured on Railway yet. Add RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, and both INR plan ids, then redeploy."}
-        </p>
-      )}
-      <LegalFooter />
+
+      <main className="pay-studio__main">
+        <div className="pay-studio__inner">
+          <h1>Purchase Premium</h1>
+          <p className="pay-studio__lead">
+            {isUsd
+              ? "Autopay via Razorpay International (USD). Cancel anytime from Razorpay or your card issuer."
+              : "Autopay via Razorpay (INR). Cancel anytime from Razorpay or your bank mandate."}
+          </p>
+          <a className="pay-studio__fx" href={currencyHref}>
+            Show {isUsd ? "₹ INR" : "$ USD"} prices
+          </a>
+
+          {lockedEmail && user.email && lockedEmail !== user.email && (
+            <p className="pay-studio__alert">
+              This purchase was started in PyClips as <b>{lockedEmail}</b>. Log out and sign in with that email.
+            </p>
+          )}
+
+          <div className="pay-studio__plans">
+            <button
+              type="button"
+              className={
+                "pay-studio__card"
+                + (monthlyHi ? " is-hi" : "")
+                + (premium ? " is-locked" : "")
+                + (monthlyActive ? " is-current" : "")
+              }
+              disabled={busy || premium}
+              onClick={() => buy("monthly")}
+            >
+              <div className="pay-studio__card-top">
+                <span className="pay-studio__name">Monthly{monthlyActive ? " · active" : ""}</span>
+                {monthlyHi ? <em>Selected</em> : null}
+                {monthlyActive ? <em className="is-live">Active</em> : null}
+              </div>
+              <div className="pay-studio__price">
+                <strong>{monthlyPrice}</strong>
+                <small>/ month</small>
+              </div>
+              <div className="pay-studio__meta">
+                <span>{premium ? "Unavailable" : busy ? "Please wait…" : "per month · autopay"}</span>
+                <span className="pay-studio__go" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className={
+                "pay-studio__card"
+                + (yearlyHi ? " is-hi" : "")
+                + (premium ? " is-locked" : "")
+                + (yearlyActive ? " is-current" : "")
+              }
+              disabled={busy || premium}
+              onClick={() => buy("yearly")}
+            >
+              <div className="pay-studio__card-top">
+                <span className="pay-studio__name">Yearly{yearlyActive ? " · active" : ""}</span>
+                {!isUsd && !yearlyActive ? <em className="is-gold">2 months free</em> : null}
+                {yearlyActive ? <em className="is-live">Active</em> : null}
+              </div>
+              <div className="pay-studio__price">
+                <strong>{yearlyPrice}</strong>
+                <small>/ year</small>
+              </div>
+              <div className="pay-studio__meta">
+                <span>
+                  {premium
+                    ? "Unavailable"
+                    : busy
+                      ? "Please wait…"
+                      : isUsd
+                        ? "per year · autopay"
+                        : "per year · autopay · 2 months free"}
+                </span>
+                <span className="pay-studio__go" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </span>
+              </div>
+            </button>
+          </div>
+
+          {msg ? (
+            <p className={"pay-studio__status" + (statusOk ? " is-ok" : statusBusy ? " is-busy" : " is-err")}>{msg}</p>
+          ) : (
+            <p className="pay-studio__status" aria-hidden="true">&nbsp;</p>
+          )}
+
+          {!paymentsOk && (
+            <p className="pay-studio__alert">
+              {isUsd
+                ? "International USD plans are not configured yet. Enable Razorpay International and set RAZORPAY_PLAN_MONTHLY_USD / YEARLY_USD."
+                : "Razorpay is not configured on Railway yet. Add RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, and both INR plan ids, then redeploy."}
+            </p>
+          )}
+        </div>
+      </main>
+
+      <footer className="pay-studio__foot">
+        <span>© 2026 PyClips</span>
+        <span aria-hidden="true">·</span>
+        <a href="/privacy">Privacy</a>
+      </footer>
     </div>
   );
 }

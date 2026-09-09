@@ -1,0 +1,343 @@
+/* Stitch account restyle — real logout, plan/usage, redeem, and /pay stay live */
+
+.account-studio {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #0b0d10;
+  color: #f2f4f7;
+  font-family: Inter, system-ui, "Segoe UI", sans-serif;
+  position: relative;
+}
+
+.account-studio::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+  z-index: 0;
+}
+
+.account-studio::after {
+  content: "";
+  position: fixed;
+  top: -160px;
+  left: 50%;
+  width: 720px;
+  height: 480px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(124, 92, 255, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.account-studio h2,
+.account-studio .brand-inline {
+  font-family: Outfit, Inter, system-ui, sans-serif;
+}
+
+.account-studio__nav,
+.account-studio__main,
+.account-studio__foot {
+  position: relative;
+  z-index: 1;
+}
+
+.account-studio__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 72px;
+  padding: 0 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(11, 13, 16, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.account-studio .brand-inline {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.account-studio .brand-mark.sm {
+  --brand-logo-size: 34px;
+}
+
+.account-studio__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  color: #8b949e;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.account-studio__logout:hover {
+  color: #f2f4f7;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.account-studio__main {
+  width: min(680px, calc(100% - 40px));
+  margin: 44px auto 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 40px;
+}
+
+.account-studio__card {
+  background: #11151a;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 28px 30px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.account-studio__card h2 {
+  margin: 0 0 22px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.account-studio__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-studio__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #0b0d10;
+}
+
+.account-studio__row span {
+  font-size: 13.5px;
+  color: #8b949e;
+}
+
+.account-studio__row b {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #f2f4f7;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.account-studio__pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-studio__pill {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1d5db;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.account-studio__pill.is-premium {
+  background: rgba(124, 92, 255, 0.18);
+  color: #b5a1ff;
+  border-color: rgba(124, 92, 255, 0.35);
+}
+
+.account-studio__pill.is-test {
+  background: rgba(255, 176, 32, 0.15);
+  color: #ffb020;
+  border-color: rgba(255, 176, 32, 0.3);
+  font-size: 10px;
+}
+
+.account-studio__note {
+  margin: 18px 0 22px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #8b949e;
+}
+
+.account-studio__pay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  background: #7c5cff;
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+  box-shadow: 0 4px 18px rgba(124, 92, 255, 0.22);
+}
+
+.account-studio__pay svg {
+  width: 16px;
+  height: 16px;
+}
+
+.account-studio__pay:hover {
+  background: #6947fa;
+}
+
+.account-studio__divider {
+  height: 1px;
+  margin: 24px 0 20px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.account-studio__redeem {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-studio__redeem-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+
+.account-studio__redeem-row {
+  display: flex;
+  gap: 10px;
+}
+
+.account-studio__input {
+  flex: 1;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #0b0d10;
+  color: #f2f4f7;
+  font-family: var(--mono);
+  font-size: 13.5px;
+}
+
+.account-studio__input::placeholder {
+  color: #555e68;
+}
+
+.account-studio__input:focus {
+  outline: none;
+  border-color: #7c5cff;
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.2);
+}
+
+.account-studio__redeem-row button {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  color: #555e68;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.account-studio__redeem-row button:disabled {
+  cursor: not-allowed;
+}
+
+.account-studio__redeem-row button:not(:disabled) {
+  background: #fff;
+  color: #0b0d10;
+  border-color: transparent;
+}
+
+.account-studio__msg {
+  margin: 4px 0 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+.account-studio__msg.is-ok {
+  background: rgba(55, 211, 153, 0.12);
+  border: 1px solid rgba(55, 211, 153, 0.25);
+  color: #37d399;
+}
+
+.account-studio__msg.is-err {
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.25);
+  color: #ff4d4d;
+}
+
+.account-studio__foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 16px 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 12.5px;
+  color: #8b949e;
+}
+
+.account-studio__foot a:hover {
+  color: #f2f4f7;
+}
+
+@media (max-width: 640px) {
+  .account-studio__nav {
+    height: 64px;
+    padding: 0 18px;
+  }
+
+  .account-studio__main {
+    width: min(680px, calc(100% - 32px));
+    margin-top: 24px;
+    gap: 18px;
+  }
+
+  .account-studio__card {
+    padding: 22px 18px;
+  }
+
+  .account-studio__redeem-row {
+    flex-direction: column;
+  }
+
+  .account-studio__redeem-row button {
+    width: 100%;
+  }
+}
