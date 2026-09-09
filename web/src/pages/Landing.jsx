@@ -115,7 +115,7 @@ const FAQS = [
   },
   {
     q: "How does Premium work?",
-    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹19 / month or ₹199 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited generations and premium features in the desktop app after you sign in with the same account.",
+    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹29 / month or ₹199 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited generations and premium features in the desktop app after you sign in with the same account.",
   },
   {
     q: "Can I use PyClips without Premium?",
@@ -498,7 +498,7 @@ export default function Landing({ user }) {
             </article>
             <article className="landing-plan landing-plan-hi">
               <p className="landing-plan-name">Premium</p>
-              <p className="landing-plan-price">{pricing?.monthly_display || "₹19"} <small>/ month</small></p>
+              <p className="landing-plan-price">{pricing?.monthly_display || "₹29"} <small>/ month</small></p>
               <p className="landing-plan-meta">or {pricing?.yearly_display || "₹199"} / year</p>
               <ul>
                 <li>Unlimited generations</li>

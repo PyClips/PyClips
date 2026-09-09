@@ -101,10 +101,11 @@ load_dotenv()
 DATA_DIR = _resolve_data_dir()
 
 # India — Razorpay INR.
-MONTHLY_PAISE = 1900
+MONTHLY_PAISE = 2900
+MONTHLY_PAISE_MIN = 1900  # still accept existing ₹19 monthly subscriptions
 YEARLY_PAISE = 19900
 CURRENCY = "INR"
-# USA / outside India — Razorpay International USD (list prices; not FX of ₹19).
+# USA / outside India — Razorpay International USD (list prices; not FX of ₹29).
 MONTHLY_CENTS = 299
 YEARLY_CENTS = 2999
 CURRENCY_USD = "USD"

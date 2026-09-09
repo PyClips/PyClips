@@ -22,6 +22,7 @@ from .config import (
     MONTHLY_CENTS,
     MONTHLY_DAYS,
     MONTHLY_PAISE,
+    MONTHLY_PAISE_MIN,
     YEARLY_CENTS,
     YEARLY_DAYS,
     YEARLY_PAISE,
@@ -496,7 +497,7 @@ def _apply_captured_payment(user_id: int, cfg: dict, pay: dict, email: str = "")
         amount = int(pay.get("amount") or 0)
     except (TypeError, ValueError):
         amount = 0
-    if amount < MONTHLY_PAISE:
+    if amount < MONTHLY_PAISE_MIN:
         return False
     payment_id = str(pay.get("id") or "")
     notes = _notes(pay)
@@ -1072,9 +1073,9 @@ def pricing_for(request: Request | None = None, currency: str = "") -> dict:
     usd_ok = razorpay_intl_ready(cfg)
     if cur == CURRENCY:
         enabled = inr_ok
-        monthly_display = "₹19"
+        monthly_display = "₹29"
         yearly_display = "₹199"
-        monthly_label = "₹19 / month"
+        monthly_label = "₹29 / month"
         yearly_label = "₹199 / year"
         amount_monthly = MONTHLY_PAISE
         amount_yearly = YEARLY_PAISE

@@ -85,7 +85,7 @@ function Privacy() {
       <div className="card">
         <h2>Payments</h2>
         <p>
-          Premium is billed in INR for India or USD outside India, both through Razorpay (including Razorpay International for non-India cards). Typical list prices are ₹19 / month or ₹199 / year in India, and $2.99 / month or $29.99 / year elsewhere. We store your plan, how long Premium lasts, and Razorpay customer/subscription ids needed to keep autopay working and to show your status.
+          Premium is billed in INR for India or USD outside India, both through Razorpay (including Razorpay International for non-India cards). Typical list prices are ₹29 / month or ₹199 / year in India, and $2.99 / month or $29.99 / year elsewhere. We store your plan, how long Premium lasts, and Razorpay customer/subscription ids needed to keep autopay working and to show your status.
           We do not store full card numbers. Razorpay’s policy:{" "}
           <a href="https://razorpay.com/privacy/" target="_blank" rel="noreferrer">Razorpay Privacy Policy</a>.
           You can cancel autopay from Razorpay or your bank / card issuer.
@@ -233,7 +233,7 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
             currency: "INR",
             provider: "razorpay",
             payments_enabled: Boolean(sub?.payments_enabled),
-            monthly_display: "₹19",
+            monthly_display: "₹29",
             yearly_display: "₹199",
             razorpay_enabled: Boolean(sub?.razorpay_enabled ?? sub?.payments_enabled),
             razorpay_intl_enabled: Boolean(sub?.razorpay_intl_enabled),
@@ -313,7 +313,7 @@ function Pay({ user, sub, ticket, defaultPlan, lockedEmail, setSub, setUser }) {
     }
   }
 
-  const monthlyPrice = pricing?.monthly_display || sub?.monthly_display || "₹19";
+  const monthlyPrice = pricing?.monthly_display || sub?.monthly_display || "₹29";
   const yearlyPrice = pricing?.yearly_display || sub?.yearly_display || "₹199";
   const isUsd = (pricing?.currency || sub?.currency) === "USD";
   const paymentsOk = isUsd
