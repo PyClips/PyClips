@@ -454,7 +454,7 @@ export default function Landing({ user }) {
               <li>Caption presets</li>
             </ul>
           </div>
-          <Shot src="/screenshots/captions.webp" alt="Caption themes such as Hormozi and word highlighting on the preview" />
+          <Shot src="/screenshots/captions.webp" alt="Caption themes and word highlighting on the preview" />
         </section>
 
         <section className="landing-split landing-split-rev reveal">
