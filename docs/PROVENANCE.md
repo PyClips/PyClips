@@ -1,64 +1,37 @@
-# PyClips provenance
+# PyClips provenance (website)
 
-This file records how PyClips was developed and how original work is separated
-from third-party components. It is a development and licensing record, not a
-warranty that PyClips has no functional overlap with other video-clipping tools.
+How original PyClips website work is separated from third-party components.
 
-## Product and this repository
+## This repository
 
-PyClips is a video-clipping product:
+This GitHub repo ([github.com/PyClips/PyClips](https://github.com/PyClips/PyClips))
+is the **public website**: marketing, accounts, Google sign-in, and Razorpay
+Premium for [pyclips.in](https://pyclips.in).
 
-- **Website** — this GitHub repository: marketing, accounts, Google sign-in, and
-  Razorpay Premium for [pyclips.in](https://pyclips.in).
-- **Windows desktop editor** — independently implemented in a separate product
-  tree. It is not published in this repository.
-
-Official GitHub: [github.com/PyClips/PyClips](https://github.com/PyClips/PyClips).
+The Windows desktop editor is a **separate** product tree and GitHub repo
+([github.com/PyClips/PyClip](https://github.com/PyClips/PyClip)). It is not
+published here.
 
 ## Original PyClips work
 
-Original PyClips source, UI, branding, configuration, and package metadata in
-this repository are proprietary. See [LICENSE](../LICENSE).
+Original website source, UI, branding, and configuration in this repository are
+proprietary. See [LICENSE](../LICENSE).
 
-That includes website Python code under `app/` and the React UI under `web/`.
+Third-party libraries, CDN fonts, and commercial APIs (Razorpay, Google OAuth)
+remain under their upstream or vendor terms. See
+[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) and [NOTICE](../NOTICE).
 
-Third-party libraries, fonts loaded from CDNs, and commercial APIs are **not**
-original PyClips code. They remain under their upstream licenses or vendor
-terms. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) and
-[NOTICE](../NOTICE).
+## Independent product
 
-The desktop editor's original code is likewise proprietary PyClips work. Its
-third-party stack (FFmpeg, faster-whisper, models, caption fonts, and so on) is
-inventoried in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) so this public
-repository has a complete product record.
+PyClips is developed as its own product. Do not copy, translate, or adapt source
+or UI from other proprietary clip applications. Website scope stays accounts and
+billing — no Whisper/ffmpeg rendering on pyclips.in.
 
-## Independent implementation
-
-PyClips is independently implemented as its own product. The desktop editor's
-core pipeline rewrite is documented in the desktop tree's clean-room audit when
-that work runs.
-
-This document does **not** claim that every historical line was always
-independently authored.
-
-PyClips does not copy, translate, refactor, rename, adapt, or reproduce source
-code, UI code, assets, branding, configuration, package metadata, or other
-implementation material from other proprietary clip products.
-
-## Expected similarities
-
-PyClips uses widely available technologies (Python, FastAPI, React, FFmpeg,
-faster-whisper, and similar) and implements a general video-clipping workflow.
-Functional or architectural similarities to other clip tools that use the same
-class of stack are expected. Those similarities do not mean source code was
-reused.
-
-This document does **not** claim that PyClips is guaranteed to contain no
-similar code to any other program, and it does not claim that no similar product
-exists.
+Many creator tools share open stacks and similar high-level flows. That kind of
+category overlap is expected and is not evidence of source reuse.
 
 ## Related documents
 
-- [LICENSE](../LICENSE) — PyClips original-code license
-- [NOTICE](../NOTICE) — short attribution list
-- [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) — verified third-party inventory
+- [LICENSE](../LICENSE)
+- [NOTICE](../NOTICE)
+- [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)
