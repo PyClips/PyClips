@@ -84,7 +84,7 @@ function Shot({ src, alt, eager = false }) {
 const FAQS = [
   {
     q: "What is PyClips?",
-    a: "PyClips is a Windows desktop app that turns videos into captioned short-form clips. It finds moments, burns styled captions, reframes for social sizes, and exports MP4s.",
+    a: "PyClips is a Windows desktop app that turns videos into captioned short-form clips. Import, set up the clip, pick a soundtrack, style captions, then bake and export MP4s.",
   },
   {
     q: "How do I install PyClips?",
@@ -96,11 +96,11 @@ const FAQS = [
   },
   {
     q: "Does PyClips support vertical videos?",
-    a: "Yes. You can output 9:16 vertical, 16:9 landscape, or 1:1 square, with manual reframing and keyframes when you want precise control.",
+    a: "Yes. You can output 9:16 vertical, 16:9 landscape, or 1:1 square, with Style controls and keyframes when you want precise framing.",
   },
   {
     q: "Can I customize captions?",
-    a: "Yes. PyClips includes a library of short-form caption styles, plus typography, highlighting, position, and presets.",
+    a: "Yes. PyClips includes caption presets, plus typography, highlighting, position, and custom styles.",
   },
   {
     q: "Does PyClips use my GPU?",
@@ -112,11 +112,11 @@ const FAQS = [
   },
   {
     q: "Is there a free version?",
-    a: "Yes. Free accounts can generate 10 clips lifetime. Deleting a clip does not restore a slot.",
+    a: "Yes. Free accounts can bake 10 clips lifetime. Deleting a clip does not restore a slot.",
   },
   {
     q: "How does Premium work?",
-    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹29 / month or ₹199 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited generations and premium features in the desktop app after you sign in with the same account.",
+    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹29 / month or ₹199 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited bakes and premium features in the desktop app after you sign in with the same account.",
   },
   {
     q: "Can I use PyClips without Premium?",
@@ -356,7 +356,7 @@ export default function Landing({ user }) {
           </h1>
           <p className="landing-lead">
             Import a video, set up the clip, add a soundtrack,
-            burn styled captions, and export shorts ready to post.
+            style captions, then bake and export shorts ready to post.
           </p>
           <div className="landing-hero-ctas">
             <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary landing-btn-lg">
@@ -375,7 +375,7 @@ export default function Landing({ user }) {
           <div className="landing-hero-visual">
             <Shot
               src="/screenshots/dashboard.webp"
-              alt="PyClips dashboard with 9:16 preview, caption settings, and GPU processing"
+              alt="PyClips dashboard with 9:16 preview, caption presets, and GPU processing"
               eager
             />
           </div>
@@ -394,7 +394,7 @@ export default function Landing({ user }) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
               </svg>
-              Style & reframe
+              Style & framing
             </li>
             <li>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
@@ -462,14 +462,14 @@ export default function Landing({ user }) {
             <p className="landing-kicker">Style</p>
             <h2>Turn landscape footage into vertical content.</h2>
             <p>
-              Style and reframe for 9:16, 16:9 or 1:1 without manually rebuilding every shot.
+              Style your footage for 9:16, 16:9 or 1:1 without manually rebuilding every shot.
             </p>
             <ul className="landing-ratios">
               <li>9:16 Vertical</li>
               <li>16:9 Landscape</li>
               <li>1:1 Square</li>
             </ul>
-            <p className="landing-note">Manual reframing and keyframes when you want precise control.</p>
+            <p className="landing-note">Keyframe framing in Style when you want precise control.</p>
           </div>
           <Shot src="/screenshots/dashboard.webp" alt="Aspect ratio controls set to 9:16 with a vertical phone preview" />
         </section>
@@ -515,9 +515,9 @@ export default function Landing({ user }) {
                 <em>Starter</em>
               </div>
               <p className="landing-plan-price">{pricing?.currency === "USD" ? "$0" : "₹0"}</p>
-              <p className="landing-plan-meta">10 lifetime generated clips</p>
+              <p className="landing-plan-meta">10 lifetime baked clips</p>
               <ul>
-                <li>Caption generation</li>
+                <li>Caption presets</li>
                 <li>Basic editing</li>
                 <li>GPU acceleration</li>
               </ul>
@@ -537,7 +537,7 @@ export default function Landing({ user }) {
                 <p className="landing-note">Outside India: $2.99 / month or $29.99 / year</p>
               )}
               <ul>
-                <li>Unlimited generations</li>
+                <li>Unlimited bakes</li>
                 <li>All caption styles</li>
                 <li>Advanced features</li>
                 <li>Premium features</li>

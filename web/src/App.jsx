@@ -60,7 +60,7 @@ function Privacy() {
         <h2>Who we are</h2>
         <p>
           PyClips is a desktop video clipping app plus this website at <a href="https://pyclips.in">pyclips.in</a>.
-          Clip rendering and transcription run in the Windows app. This website is for accounts, Premium, and redeem codes.
+          Clip baking and speech processing run in the Windows app. This website is for accounts, Premium, and redeem codes.
         </p>
       </div>
 
@@ -95,7 +95,7 @@ function Privacy() {
       <div className="card">
         <h2>Terms of purchase</h2>
         <p>
-          Premium unlocks unlimited clip generations and premium desktop features for the paid period. India charges are in INR; charges outside India are in USD via Razorpay International. Prices are list prices (not a live FX conversion). Failed payments do not grant Premium. When a subscription is cancelled or ends, Premium access ends according to the provider’s billing period. Taxes may be collected by the payment provider where applicable. Microsoft Store listings do not sell Premium inside the Store window — checkout always happens on pyclips.in.
+          Premium unlocks unlimited clip bakes and premium desktop features for the paid period. India charges are in INR; charges outside India are in USD via Razorpay International. Prices are list prices (not a live FX conversion). Failed payments do not grant Premium. When a subscription is cancelled or ends, Premium access ends according to the provider’s billing period. Taxes may be collected by the payment provider where applicable. Microsoft Store listings do not sell Premium inside the Store window — checkout always happens on pyclips.in.
         </p>
       </div>
 
@@ -110,7 +110,7 @@ function Privacy() {
       <div className="card">
         <h2>Desktop app and your videos</h2>
         <p>
-          Source videos, transcripts, and exported clips are handled in the desktop app, not stored on pyclips.in.
+          Source videos, speech/caption data, and exported clips are handled in the desktop app, not stored on pyclips.in.
           The app may send your email, clip usage count, and a sync token to this website so Premium and free-tier limits stay in sync.
         </p>
       </div>
@@ -149,7 +149,7 @@ function Account({ user, sub, setSub, setUser }) {
   const premium = sub?.plan === "premium";
   const used = sub?.videos_used ?? 0;
   const limit = sub?.videos_limit;
-  const usageLabel = premium || limit == null ? `${used} clips generated` : `${used} / ${limit} clips generated`;
+  const usageLabel = premium || limit == null ? `${used} clips baked` : `${used} / ${limit} clips baked`;
   const showTest = Boolean(sub?.test_mode && sub?.payments_enabled);
   const msgOk = msg === "Code applied. Premium is active.";
 
@@ -233,7 +233,7 @@ function Account({ user, sub, setSub, setUser }) {
           </div>
 
           <p className="account-studio__note">
-            Free accounts can generate 10 clips (lifetime; deleting a clip does not restore a slot).
+            Free accounts can bake 10 clips (lifetime; deleting a clip does not restore a slot).
             Premium uses Razorpay autopay — INR in India, USD elsewhere (Razorpay International).
           </p>
 

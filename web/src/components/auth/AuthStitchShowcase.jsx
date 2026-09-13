@@ -41,12 +41,12 @@ export default function AuthStitchShowcase({ variant = "web" }) {
 
       <div className="auth-stitch__copy">
         <h2 className="auth-stitch__title">
-          {isWeb ? <>Account for your <em>clip studio</em></> : <>Stitch moments into <em>shorts</em></>}
+          {isWeb ? <>Account for your <em>clip studio</em></> : <>Build clips into <em>shorts</em></>}
         </h2>
         <p className="auth-stitch__lead">
           {isWeb
             ? "Premium, coupons, and billing live here. Baking clips happens in the Windows app."
-            : "Fetch media, hear speech, choose moments, bake captions, and export MP4s."}
+            : "Fetch media, hear speech, choose clips, bake captions, and export MP4s."}
         </p>
       </div>
 
