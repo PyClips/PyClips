@@ -310,6 +310,21 @@
   color: #8b949e;
 }
 
+.landing-stitch .landing-fx {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #8b949e;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(255, 255, 255, 0.14);
+}
+
+.landing-stitch .landing-fx:hover {
+  color: #f2f4f7;
+  text-decoration-color: #f2f4f7;
+}
+
 .landing-stitch .landing-stages {
   margin-top: 64px;
   gap: 24px;

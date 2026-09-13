@@ -124,11 +124,17 @@ const FAQS = [
   },
 ];
 
+function currencyFromQuery() {
+  const value = (new URLSearchParams(window.location.search).get("currency") || "").toUpperCase();
+  return value === "USD" || value === "INR" ? value : "";
+}
+
 export default function Landing({ user }) {
   const pageRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [exeUrl, setExeUrl] = useState(DOWNLOAD_URL || "");
   const [pricing, setPricing] = useState(null);
+  const currencyOverride = currencyFromQuery();
 
   useEffect(() => {
     document.title = "PyClips — Turn Any Video Into Captioned Shorts";
@@ -136,11 +142,18 @@ export default function Landing({ user }) {
 
   useEffect(() => {
     let live = true;
-    api.pricing()
+    api.pricing(currencyOverride)
       .then((data) => { if (live) setPricing(data); })
-      .catch(() => {});
+      .catch(() => {
+        if (!live) return;
+        setPricing(
+          currencyOverride === "USD"
+            ? { currency: "USD", monthly_display: "$2.99", yearly_display: "$29.99" }
+            : { currency: "INR", monthly_display: "₹29", yearly_display: "₹199" },
+        );
+      });
     return () => { live = false; };
-  }, []);
+  }, [currencyOverride]);
 
   useEffect(() => {
     let live = true;
@@ -290,6 +303,12 @@ export default function Landing({ user }) {
   function closeMenu() {
     setMenuOpen(false);
   }
+
+  const isUsd = (pricing?.currency || currencyOverride) === "USD";
+  const monthlyPrice = pricing?.monthly_display || (isUsd ? "$2.99" : "₹29");
+  const yearlyPrice = pricing?.yearly_display || (isUsd ? "$29.99" : "₹199");
+  const currencyHref = `/?currency=${isUsd ? "INR" : "USD"}#pricing`;
+  const payHref = `/pay?currency=${isUsd ? "USD" : "INR"}`;
 
   return (
     <div className="landing landing-stitch" ref={pageRef}>
@@ -507,14 +526,21 @@ export default function Landing({ user }) {
 
         <section className="landing-block reveal" id="pricing">
           <h2>Start creating with PyClips.</h2>
-          <p className="landing-subhead">India: ₹29 / month or ₹199 / year. Outside India: $2.99 / month or $29.99 / year.</p>
+          <p className="landing-subhead">
+            {isUsd
+              ? `${monthlyPrice} / month or ${yearlyPrice} / year · Razorpay International (USD).`
+              : `${monthlyPrice} / month or ${yearlyPrice} / year · Razorpay (INR).`}
+          </p>
+          <a className="landing-fx" href={currencyHref}>
+            Show {isUsd ? "₹ INR" : "$ USD"} prices
+          </a>
           <div className="landing-plans">
             <article className="landing-plan">
               <div className="landing-plan-head">
                 <p className="landing-plan-name">Free</p>
                 <em>Starter</em>
               </div>
-              <p className="landing-plan-price">{pricing?.currency === "USD" ? "$0" : "₹0"}</p>
+              <p className="landing-plan-price">{isUsd ? "$0" : "₹0"}</p>
               <p className="landing-plan-meta">10 lifetime baked clips</p>
               <ul>
                 <li>Caption presets</li>
@@ -531,11 +557,8 @@ export default function Landing({ user }) {
                 <p className="landing-plan-name">Premium</p>
                 <em>Premium</em>
               </div>
-              <p className="landing-plan-price">{pricing?.monthly_display || "₹29"} <small>/ month</small></p>
-              <p className="landing-plan-meta">or {pricing?.yearly_display || "₹199"} / year</p>
-              {pricing?.currency !== "USD" && (
-                <p className="landing-note">Outside India: $2.99 / month or $29.99 / year</p>
-              )}
+              <p className="landing-plan-price">{monthlyPrice} <small>/ month</small></p>
+              <p className="landing-plan-meta">or {yearlyPrice} / year</p>
               <ul>
                 <li>Unlimited bakes</li>
                 <li>All caption styles</li>
@@ -543,9 +566,13 @@ export default function Landing({ user }) {
                 <li>Premium features</li>
               </ul>
               <SurfaceFrame variant="primary" full>
-                <a className="landing-btn landing-btn-primary landing-btn-full" href="/pay">Get Premium</a>
+                <a className="landing-btn landing-btn-primary landing-btn-full" href={payHref}>Get Premium</a>
               </SurfaceFrame>
-              <p className="landing-note">Billed on this website via Razorpay. Cancel autopay from Razorpay or your bank mandate.</p>
+              <p className="landing-note">
+                {isUsd
+                  ? "Billed on this website via Razorpay International. Cancel autopay from Razorpay or your card issuer."
+                  : "Billed on this website via Razorpay. Cancel autopay from Razorpay or your bank mandate."}
+              </p>
             </article>
           </div>
         </section>
