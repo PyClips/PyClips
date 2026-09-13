@@ -34,18 +34,16 @@ repository has a complete product record.
 
 ## Independent implementation
 
-PyClips was independently implemented as its own product.
+PyClips is independently implemented as its own product. The desktop editor's
+core pipeline rewrite is documented in the desktop tree's clean-room audit when
+that work runs.
 
-During development, a packaged third-party video-clipping application
-(Clipshlip) was inspected only to compare high-level architecture and
-functionality — for example, that a clip workflow may include ingest,
-transcription, clip selection, caption burn-in, and export. That inspection was
-not used as a source of implementation material.
+This document does **not** claim that every historical line was always
+independently authored.
 
 PyClips does not copy, translate, refactor, rename, adapt, or reproduce source
 code, UI code, assets, branding, configuration, package metadata, or other
-implementation material from Clipshlip, UniSin, AutoClips, or other proprietary
-products.
+implementation material from other proprietary clip products.
 
 ## Expected similarities
 
