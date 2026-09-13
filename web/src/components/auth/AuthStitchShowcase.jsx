@@ -45,8 +45,8 @@ export default function AuthStitchShowcase({ variant = "web" }) {
         </h2>
         <p className="auth-stitch__lead">
           {isWeb
-            ? "Premium, coupons, and billing live here. Rendering happens in the Windows app."
-            : "Transcribe speech, pick clip windows, burn captions, and export MP4s."}
+            ? "Premium, coupons, and billing live here. Baking clips happens in the Windows app."
+            : "Fetch media, hear speech, choose moments, bake captions, and export MP4s."}
         </p>
       </div>
 

@@ -355,8 +355,8 @@ export default function Landing({ user }) {
             <span>captioned vertical clips.</span>
           </h1>
           <p className="landing-lead">
-            Import a video, find strong moments, reframe for 9:16,
-            and burn styled captions ready to post.
+            Import a video, set up the clip, add a soundtrack,
+            burn styled captions, and export shorts ready to post.
           </p>
           <div className="landing-hero-ctas">
             <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary landing-btn-lg">
@@ -388,19 +388,19 @@ export default function Landing({ user }) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
               </svg>
-              Caption style library
+              Caption presets
             </li>
             <li>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
               </svg>
-              Manual reframe keyframes
+              Style & reframe
             </li>
             <li>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
               </svg>
-              Music ducking
+              Soundtrack ducking
             </li>
           </ul>
         </section>
@@ -424,7 +424,7 @@ export default function Landing({ user }) {
                 <em>Customization</em>
               </div>
               <h3>Style</h3>
-              <p>Choose captions, framing, effects and music.</p>
+              <p>Clip setup, soundtrack, captions, and look — in the same order as the app.</p>
               <Shot src="/screenshots/captions.webp" alt="PyClips caption style picker beside a phone preview" />
             </article>
             <article>
@@ -433,7 +433,7 @@ export default function Landing({ user }) {
                 <em>Output</em>
               </div>
               <h3>Export</h3>
-              <p>Render a polished short ready to post.</p>
+              <p>Bake and export a polished short ready to post.</p>
               <Shot src="/screenshots/library.webp" alt="PyClips library with a finished vertical clip" />
             </article>
           </div>
@@ -459,10 +459,10 @@ export default function Landing({ user }) {
 
         <section className="landing-split landing-split-rev reveal">
           <div>
-            <p className="landing-kicker">Framing</p>
+            <p className="landing-kicker">Style</p>
             <h2>Turn landscape footage into vertical content.</h2>
             <p>
-              Reframe your footage for 9:16, 16:9 or 1:1 without manually rebuilding every shot.
+              Style and reframe for 9:16, 16:9 or 1:1 without manually rebuilding every shot.
             </p>
             <ul className="landing-ratios">
               <li>9:16 Vertical</li>
@@ -476,13 +476,13 @@ export default function Landing({ user }) {
 
         <section className="landing-split reveal">
           <div>
-            <p className="landing-kicker">Music</p>
+            <p className="landing-kicker">Soundtrack</p>
             <h2>Give every clip more energy.</h2>
             <p>
-              Add background music, control volume, duck music under speech, and line tracks up with the beat.
+              Pick a soundtrack, control volume, duck under speech, and line tracks up with the beat.
             </p>
             <ul className="landing-feature-list">
-              <li>Music waveform</li>
+              <li>Soundtrack waveform</li>
               <li>Volume</li>
               <li>Ducking</li>
               <li>Beat analysis</li>
@@ -493,15 +493,14 @@ export default function Landing({ user }) {
 
         <section className="landing-block landing-flow-block reveal">
           <h2>One workflow. No editing headache.</h2>
-          <p className="landing-subhead">Import, caption, reframe, mix music, and export from one Windows app.</p>
+          <p className="landing-subhead">Import, clip setup, soundtrack, captions, style, review, and export from one Windows app.</p>
           <ol className="landing-flow">
             <li>Import</li>
-            <li>Transcribe</li>
-            <li>Find moments</li>
-            <li>Caption</li>
-            <li>Reframe</li>
-            <li>Add music</li>
-            <li>Render</li>
+            <li>Clip</li>
+            <li>Soundtrack</li>
+            <li>Captions</li>
+            <li>Style</li>
+            <li>Review</li>
             <li>Export</li>
           </ol>
         </section>
