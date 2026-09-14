@@ -112,7 +112,7 @@ const FAQS = [
   },
   {
     q: "Is there a free version?",
-    a: "Yes. Free accounts can bake 10 clips lifetime. Deleting a clip does not restore a slot.",
+    a: "Yes. Free accounts can bake 20 clips lifetime. Deleting a clip does not restore a slot.",
   },
   {
     q: "How does Premium work?",
@@ -120,7 +120,7 @@ const FAQS = [
   },
   {
     q: "Can I use PyClips without Premium?",
-    a: "Yes. You can use PyClips on the free tier, up to the 10-clip lifetime limit.",
+    a: "Yes. You can use PyClips on the free tier, up to the 20-clip lifetime limit.",
   },
 ];
 
@@ -389,7 +389,7 @@ export default function Landing({ user }) {
             <li>Windows app</li>
             <li>Styled captions</li>
             <li>GPU optional</li>
-            <li>10 free clips</li>
+            <li>20 free clips</li>
           </ul>
           <div className="landing-hero-visual">
             <Shot
@@ -541,7 +541,7 @@ export default function Landing({ user }) {
                 <em>Starter</em>
               </div>
               <p className="landing-plan-price">{isUsd ? "$0" : "₹0"}</p>
-              <p className="landing-plan-meta">10 lifetime baked clips</p>
+              <p className="landing-plan-meta">20 lifetime baked clips</p>
               <ul>
                 <li>Caption presets</li>
                 <li>Basic editing</li>

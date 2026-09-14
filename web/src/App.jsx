@@ -233,7 +233,7 @@ function Account({ user, sub, setSub, setUser }) {
           </div>
 
           <p className="account-studio__note">
-            Free accounts can bake 10 clips (lifetime; deleting a clip does not restore a slot).
+            Free accounts can bake 20 clips (lifetime; deleting a clip does not restore a slot).
             Premium uses Razorpay autopay — INR in India, USD elsewhere (Razorpay International).
           </p>
 

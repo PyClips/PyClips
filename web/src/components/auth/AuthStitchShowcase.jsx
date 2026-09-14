@@ -91,7 +91,7 @@ export default function AuthStitchShowcase({ variant = "web" }) {
 
       <ul className="auth-stitch__facts">
         <li>9:16 · 16:9 · 1:1 export</li>
-        <li>{isWeb ? "Sync Premium to desktop" : "10 free clips included"}</li>
+        <li>{isWeb ? "Sync Premium to desktop" : "20 free clips included"}</li>
         <li>Word-by-word captions</li>
       </ul>
     </aside>
