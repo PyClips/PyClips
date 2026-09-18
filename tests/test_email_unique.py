@@ -138,6 +138,23 @@ class EmailUniqueTests(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["email"], "microsoft.testing@gmail.com")
 
+    def test_providers_keep_microsoft_off_and_password_on_local(self):
+        r = self.client.get("/api/auth/providers")
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        self.assertTrue(body["password"])
+        self.assertFalse(body["microsoft"])
+
+    def test_railway_rejects_email_password_login(self):
+        from unittest import mock
+
+        with mock.patch("app.config.on_railway", return_value=True):
+            r = self.client.post(
+                "/api/auth/login",
+                json={"email": "microsoft.testing@gmail.com", "password": "password12"},
+            )
+        self.assertEqual(r.status_code, 403)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,6 +14,17 @@ function GoogleMark() {
   );
 }
 
+function MicrosoftMark() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="#F25022" d="M3 3h8.5v8.5H3z" />
+      <path fill="#7FBA00" d="M12.5 3H21v8.5h-8.5z" />
+      <path fill="#00A4EF" d="M3 12.5h8.5V21H3z" />
+      <path fill="#FFB900" d="M12.5 12.5H21V21h-8.5z" />
+    </svg>
+  );
+}
+
 function MailIco() {
   return (
     <svg className="auth-field__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -66,6 +77,11 @@ function ArrowIco() {
   );
 }
 
+function isLocalHost() {
+  const h = (typeof window !== "undefined" ? window.location.hostname : "").toLowerCase();
+  return h === "localhost" || h === "127.0.0.1" || h === "[::1]";
+}
+
 export default function AuthPanel({ ticket, lockedEmail, onAuthed, footer }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState(lockedEmail || "");
@@ -74,6 +90,7 @@ export default function AuthPanel({ ticket, lockedEmail, onAuthed, footer }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [googleOn, setGoogleOn] = useState(false);
+  const [passwordOk, setPasswordOk] = useState(isLocalHost());
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -84,7 +101,13 @@ export default function AuthPanel({ ticket, lockedEmail, onAuthed, footer }) {
       url.searchParams.delete("auth_error");
       window.history.replaceState({}, "", url.pathname + url.search + url.hash);
     }
-    api.providers().then((p) => setGoogleOn(Boolean(p.google))).catch(() => setGoogleOn(false));
+    api.providers().then((p) => {
+      setGoogleOn(Boolean(p.google));
+      setPasswordOk(isLocalHost());
+    }).catch(() => {
+      setGoogleOn(false);
+      setPasswordOk(isLocalHost());
+    });
   }, []);
 
   useEffect(() => {
@@ -134,14 +157,15 @@ export default function AuthPanel({ ticket, lockedEmail, onAuthed, footer }) {
     <>
       <div className="auth-gate__head">
         <p className="auth-gate__kicker">pyclips.in</p>
-        <h1>{mode === "signup" ? "Create your PyClips account" : "Sign in to PyClips"}</h1>
+        <h1>{passwordOk && mode === "signup" ? "Create your PyClips account" : "Sign in to PyClips"}</h1>
         <p>
-          {mode === "signup"
+          {passwordOk && mode === "signup"
             ? "Premium billing and coupons are managed here, then sync to the desktop app."
-            : "Access Premium, redeem codes, and manage your subscription."}
+            : "Continue with Google. Microsoft sign-in is coming soon."}
         </p>
       </div>
 
+      {passwordOk && (
       <div className="auth-gate__tabs" role="tablist" aria-label="Account mode">
         <button
           type="button"
@@ -158,14 +182,21 @@ export default function AuthPanel({ ticket, lockedEmail, onAuthed, footer }) {
           Create account
         </button>
       </div>
+      )}
 
       <div className="auth-gate__oauth">
         <button type="button" className="btn auth-oauth" onClick={startGoogle} disabled={busy}>
           <GoogleMark /> Continue with Google
         </button>
+        <button type="button" className="btn auth-oauth auth-oauth-soon" disabled title="Coming soon">
+          <MicrosoftMark /> Continue with Microsoft
+          <span className="auth-soon">Coming soon</span>
+        </button>
       </div>
 
-      <div className="auth-gate__divider">Email</div>
+      {passwordOk ? (
+      <>
+      <div className="auth-gate__divider">Dev email</div>
 
       <form className="auth-gate__form auth-form" onSubmit={submit}>
         {mode === "signup" && (
@@ -228,6 +259,10 @@ export default function AuthPanel({ ticket, lockedEmail, onAuthed, footer }) {
           {!busy ? <ArrowIco /> : null}
         </button>
       </form>
+      </>
+      ) : (
+        error ? <div className="error">{error}</div> : null
+      )}
     </>
   );
 

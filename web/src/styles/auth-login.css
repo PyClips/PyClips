@@ -582,6 +582,16 @@
 
 .auth-gate__oauth .auth-oauth-soon {
   opacity: 0.5;
+  position: relative;
+}
+
+.auth-soon {
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .auth-gate__divider {

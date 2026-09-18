@@ -43,6 +43,7 @@ def health() -> dict:
 
 @app.post("/api/auth/register")
 def register(body: auth.RegisterBody, response: Response) -> dict:
+    auth.require_password_login()
     user = auth.create_user(body.email, body.password, body.username)
     if body.ticket:
         tickets.bind_ticket(body.ticket, user["id"])
@@ -52,6 +53,7 @@ def register(body: auth.RegisterBody, response: Response) -> dict:
 
 @app.post("/api/auth/login")
 def login(body: auth.LoginBody, response: Response) -> dict:
+    auth.require_password_login()
     user = auth.authenticate(body.email, body.password)
     if body.ticket:
         tickets.bind_ticket(body.ticket, user["id"])
@@ -67,7 +69,11 @@ def logout(response: Response) -> dict:
 
 @app.get("/api/auth/providers")
 def auth_providers() -> dict:
-    return {"google": oauth.google_ready(), "microsoft": False}
+    return {
+        "google": oauth.google_ready(),
+        "microsoft": False,
+        "password": auth.password_login_enabled(),
+    }
 
 
 @app.get("/api/auth/google")

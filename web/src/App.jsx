@@ -67,8 +67,8 @@ function Privacy() {
       <div className="card">
         <h2>Account information</h2>
         <p>
-          When you create an account we store your email, username, password hash (if you sign up with email),
-          and optionally your Google account id if you use Continue with Google. We use this to sign you in,
+          When you sign in we store your email, username, and Google account id if you use Continue with Google.
+          Public sign-in does not use a PyClips password. We use this to sign you in,
           attach Premium, and sync that status to the PyClips desktop app on the same email.
         </p>
       </div>

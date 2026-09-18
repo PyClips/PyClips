@@ -21,6 +21,21 @@ SESSION_DAYS = 30
 _PBKDF2_ROUNDS = 210_000
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _USER_RE = re.compile(r"^[a-zA-Z0-9_]{3,24}$")
+_PASSWORD_LOGIN_OFF = (
+    "Email sign-in is only for localhost. Use Google or Microsoft on pyclips.in."
+)
+
+
+def password_login_enabled() -> bool:
+    """Email/password stays on the local website, never on Railway / pyclips.in."""
+    from .config import on_railway
+
+    return not on_railway()
+
+
+def require_password_login() -> None:
+    if not password_login_enabled():
+        raise HTTPException(status_code=403, detail=_PASSWORD_LOGIN_OFF)
 
 
 class RegisterBody(BaseModel):
