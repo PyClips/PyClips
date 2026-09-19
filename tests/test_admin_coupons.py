@@ -41,6 +41,7 @@ class AdminCouponTests(unittest.TestCase):
         conn.commit()
         db.save_coupons({"PYCLIPS-DEV": {"days": 30}})
         db.delete_setting(db.WINDOWS_EXE_KEY)
+        db.delete_setting(db.DOWNLOAD_HITS_KEY)
         from app import billing
 
         billing._repair_miss_until.clear()
@@ -656,6 +657,11 @@ class AdminCouponTests(unittest.TestCase):
         bounced = self.client.get("/download", follow_redirects=False)
         self.assertEqual(bounced.status_code, 302)
         self.assertEqual(bounced.headers.get("location"), asset)
+        self.client.post("/api/admin/login", json={"password": "test-admin-secret"})
+        overview = self.client.get("/api/admin/overview")
+        self.assertEqual(overview.status_code, 200, overview.text)
+        self.assertEqual(overview.json()["website_downloads"], 1)
+        self.client.post("/api/admin/logout")
 
         self.client.post("/api/admin/login", json={"password": "test-admin-secret"})
         cleared = self.client.post("/api/admin/download/clear")
@@ -664,6 +670,66 @@ class AdminCouponTests(unittest.TestCase):
         gone = self.client.get("/download", follow_redirects=False)
         self.assertEqual(gone.status_code, 404)
         self.assertFalse(self.client.get("/api/download").json()["available"])
+
+    def test_overview_rejected_without_cookie(self):
+        self.client.post("/api/admin/logout")
+        r = self.client.get("/api/admin/overview")
+        self.assertEqual(r.status_code, 401)
+        self.assertEqual(self.client.get("/api/admin/users").status_code, 401)
+
+    def test_dashboard_users_and_download_hits(self):
+        email_user = self._user("ada@example.com")
+        google = auth.upsert_google_user("gid-ada", "google.user@gmail.com", "GoogleUser")
+        conn = db.get_conn()
+        conn.execute(
+            "UPDATE users SET plan = 'premium', premium_until = '2099-01-01T00:00:00Z' WHERE id = ?",
+            (email_user["id"],),
+        )
+        conn.commit()
+        self.client.post("/api/admin/login", json={"password": "test-admin-secret"})
+        overview = self.client.get("/api/admin/overview")
+        self.assertEqual(overview.status_code, 200, overview.text)
+        body = overview.json()
+        self.assertEqual(body["accounts"], 2)
+        self.assertEqual(body["google_logins"], 1)
+        self.assertEqual(body["email_logins"], 1)
+        self.assertEqual(body["premium"], 1)
+        self.assertEqual(body["free"], 1)
+        self.assertEqual(body["website_downloads"], 0)
+        listed = self.client.get("/api/admin/users")
+        rows = listed.json()["users"]
+        self.assertEqual(listed.json()["total"], 2)
+        self.assertNotIn("password_hash", rows[0])
+        found = self.client.get("/api/admin/users?q=ada@")
+        self.assertEqual(found.json()["total"], 1)
+        patched = self.client.patch(
+            f"/api/admin/users/{google['id']}",
+            json={
+                "plan": "premium",
+                "premium_until": "2030-06-15",
+                "videos_used": 4,
+                "billing_plan": "coupon",
+            },
+        )
+        self.assertEqual(patched.status_code, 200, patched.text)
+        self.assertEqual(patched.json()["plan"], "premium")
+        self.assertEqual(patched.json()["videos_used"], 4)
+        self.assertTrue(str(patched.json()["premium_until"]).startswith("2030-06-15"))
+        clash = self.client.patch(
+            f"/api/admin/users/{google['id']}",
+            json={"email": "ada@example.com"},
+        )
+        self.assertEqual(clash.status_code, 409)
+        hits = self.client.post("/api/admin/download-hits", json={"hits": 12})
+        self.assertEqual(hits.status_code, 200, hits.text)
+        self.assertEqual(hits.json()["hits"], 12)
+        self.assertEqual(self.client.get("/api/admin/overview").json()["website_downloads"], 12)
+        gone = self.client.delete(f"/api/admin/users/{email_user['id']}")
+        self.assertEqual(gone.status_code, 200, gone.text)
+        self.assertEqual(self.client.get("/api/admin/overview").json()["accounts"], 1)
+        missing = self.client.delete(f"/api/admin/users/{email_user['id']}")
+        self.assertEqual(missing.status_code, 404)
+        self.client.post("/api/admin/logout")
 
 
 class AdminDisabledTests(unittest.TestCase):

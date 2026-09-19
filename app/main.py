@@ -180,6 +180,36 @@ def admin_clear_download(request: Request) -> dict:
     return admin.clear_download()
 
 
+@app.get("/api/admin/overview")
+def admin_overview(request: Request) -> dict:
+    admin.require_admin(request)
+    return admin.overview()
+
+
+@app.get("/api/admin/users")
+def admin_list_users(request: Request, q: str = "", limit: int = 100, offset: int = 0) -> dict:
+    admin.require_admin(request)
+    return admin.list_users(q=q, limit=limit, offset=offset)
+
+
+@app.patch("/api/admin/users/{user_id}")
+def admin_update_user(user_id: int, request: Request, body: admin.UpdateUserBody) -> dict:
+    admin.require_admin(request)
+    return admin.update_user(user_id, body)
+
+
+@app.delete("/api/admin/users/{user_id}")
+def admin_delete_user(user_id: int, request: Request) -> dict:
+    admin.require_admin(request)
+    return admin.delete_user(user_id)
+
+
+@app.post("/api/admin/download-hits")
+def admin_set_download_hits(request: Request, body: admin.SetDownloadHitsBody) -> dict:
+    admin.require_admin(request)
+    return admin.set_download_hits(body)
+
+
 @app.get("/api/download")
 def public_download() -> dict:
     return admin.public_download()
@@ -187,7 +217,9 @@ def public_download() -> dict:
 
 @app.get("/download")
 def download_windows():
-    return RedirectResponse(url=admin.windows_exe_target(), status_code=302)
+    url = admin.windows_exe_target()
+    admin.record_download_hit()
+    return RedirectResponse(url=url, status_code=302)
 
 
 @app.post("/api/billing/webhook")

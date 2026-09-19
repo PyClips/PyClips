@@ -18,12 +18,12 @@ async function jget(path) {
   return data;
 }
 
-async function jpost(path, body) {
+async function jsend(method, path, body) {
   const r = await fetch(path, {
     ...cred,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body || {}),
+    method,
+    headers: body !== undefined ? { "Content-Type": "application/json" } : {},
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
   const data = await r.json().catch(() => ({}));
   if (!r.ok) {
@@ -32,6 +32,18 @@ async function jpost(path, body) {
     throw err;
   }
   return data;
+}
+
+async function jpost(path, body) {
+  return jsend("POST", path, body || {});
+}
+
+async function jpatch(path, body) {
+  return jsend("PATCH", path, body || {});
+}
+
+async function jdel(path) {
+  return jsend("DELETE", path);
 }
 
 export const api = {
@@ -56,6 +68,12 @@ export const api = {
   adminDownload: () => jget("/api/admin/download"),
   adminSetDownload: (url) => jpost("/api/admin/download", { url }),
   adminClearDownload: () => jpost("/api/admin/download/clear", {}),
+  adminOverview: () => jget("/api/admin/overview"),
+  adminUsers: (q = "", offset = 0) =>
+    jget(`/api/admin/users?q=${encodeURIComponent(q || "")}&limit=200&offset=${Number(offset) || 0}`),
+  adminUpdateUser: (id, body) => jpatch(`/api/admin/users/${id}`, body),
+  adminDeleteUser: (id) => jdel(`/api/admin/users/${id}`),
+  adminSetDownloadHits: (hits) => jpost("/api/admin/download-hits", { hits: Number(hits) || 0 }),
   publicDownload: () => jget("/api/download"),
 };
 

@@ -273,6 +273,7 @@ def save_coupons(data: dict) -> None:
 
 
 WINDOWS_EXE_KEY = "windows_exe_url"
+DOWNLOAD_HITS_KEY = "windows_download_hits"
 
 
 def get_setting(key: str) -> dict | None:
@@ -304,3 +305,24 @@ def delete_setting(key: str) -> None:
         conn = get_conn()
         conn.execute("DELETE FROM site_settings WHERE key = ?", (key,))
         conn.commit()
+
+
+def get_download_hits() -> int:
+    row = get_setting(DOWNLOAD_HITS_KEY)
+    if not row:
+        return 0
+    try:
+        return max(0, int(row["value"]))
+    except (TypeError, ValueError):
+        return 0
+
+
+def set_download_hits(n: int) -> int:
+    hits = max(0, int(n))
+    set_setting(DOWNLOAD_HITS_KEY, str(hits))
+    return hits
+
+
+def increment_download_hits() -> int:
+    with _lock:
+        return set_download_hits(get_download_hits() + 1)
