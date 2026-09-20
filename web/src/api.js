@@ -69,8 +69,8 @@ export const api = {
   adminSetDownload: (url) => jpost("/api/admin/download", { url }),
   adminClearDownload: () => jpost("/api/admin/download/clear", {}),
   adminOverview: () => jget("/api/admin/overview"),
-  adminUsers: (q = "", offset = 0) =>
-    jget(`/api/admin/users?q=${encodeURIComponent(q || "")}&limit=200&offset=${Number(offset) || 0}`),
+  adminUsers: (q = "", offset = 0, plan = "all") =>
+    jget(`/api/admin/users?q=${encodeURIComponent(q || "")}&plan=${encodeURIComponent(plan || "all")}&limit=200&offset=${Number(offset) || 0}`),
   adminUpdateUser: (id, body) => jpatch(`/api/admin/users/${id}`, body),
   adminDeleteUser: (id) => jdel(`/api/admin/users/${id}`),
   adminSetDownloadHits: (hits) => jpost("/api/admin/download-hits", { hits: Number(hits) || 0 }),

@@ -702,6 +702,20 @@ class AdminCouponTests(unittest.TestCase):
         self.assertNotIn("password_hash", rows[0])
         found = self.client.get("/api/admin/users?q=ada@")
         self.assertEqual(found.json()["total"], 1)
+        premium = self.client.get("/api/admin/users?plan=premium")
+        self.assertEqual(premium.status_code, 200, premium.text)
+        self.assertEqual(premium.json()["total"], 1)
+        self.assertEqual(premium.json()["plan"], "premium")
+        self.assertEqual(premium.json()["users"][0]["email"], "ada@example.com")
+        free = self.client.get("/api/admin/users?plan=free")
+        self.assertEqual(free.json()["total"], 1)
+        self.assertEqual(free.json()["users"][0]["email"], "google.user@gmail.com")
+        both = self.client.get("/api/admin/users?plan=all")
+        self.assertEqual(both.json()["total"], 2)
+        none = self.client.get("/api/admin/users?plan=premium&q=google.user")
+        self.assertEqual(none.json()["total"], 0)
+        bad = self.client.get("/api/admin/users?plan=gold")
+        self.assertEqual(bad.status_code, 400)
         patched = self.client.patch(
             f"/api/admin/users/{google['id']}",
             json={

@@ -79,15 +79,23 @@ export default function Admin() {
   const [users, setUsers] = useState([]);
   const [userTotal, setUserTotal] = useState(0);
   const [userQuery, setUserQuery] = useState("");
+  const [userPlan, setUserPlan] = useState("all");
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
 
-  async function loadAdmin() {
+  async function loadUsers(q = userQuery, plan = userPlan) {
+    const data = await api.adminUsers((q || "").trim(), 0, plan || "all");
+    setUsers(data.users || []);
+    setUserTotal(data.total || 0);
+    return data;
+  }
+
+  async function loadAdmin(plan = userPlan) {
     const [couponData, downloadData, overviewData, userData] = await Promise.all([
       api.adminCoupons(),
       api.adminDownload(),
       api.adminOverview(),
-      api.adminUsers(""),
+      api.adminUsers(userQuery.trim(), 0, plan || "all"),
     ]);
     setCoupons(couponData.coupons || []);
     setStorage(couponData.storage || overviewData.storage || null);
@@ -145,6 +153,8 @@ export default function Admin() {
       setStats(null);
       setUsers([]);
       setUserTotal(0);
+      setUserQuery("");
+      setUserPlan("all");
       setEditingId(null);
       setDraft(null);
       setTab("overview");
@@ -157,9 +167,22 @@ export default function Admin() {
     setMsg("");
     setBusy(true);
     try {
-      const data = await api.adminUsers(userQuery.trim());
-      setUsers(data.users || []);
-      setUserTotal(data.total || 0);
+      await loadUsers(userQuery, userPlan);
+      setEditingId(null);
+      setDraft(null);
+    } catch (err) {
+      setMsg(err.message || "Could not load accounts.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function filterUsers(plan) {
+    setUserPlan(plan);
+    setMsg("");
+    setBusy(true);
+    try {
+      await loadUsers(userQuery, plan);
       setEditingId(null);
       setDraft(null);
     } catch (err) {
@@ -202,12 +225,7 @@ export default function Admin() {
       });
       setEditingId(null);
       setDraft(null);
-      await loadAdmin();
-      if (userQuery.trim()) {
-        const data = await api.adminUsers(userQuery.trim());
-        setUsers(data.users || []);
-        setUserTotal(data.total || 0);
-      }
+      await loadAdmin(userPlan);
       setMsg("Account saved.");
     } catch (err) {
       setMsg(err.message || "Could not save that account.");
@@ -228,12 +246,7 @@ export default function Admin() {
         setEditingId(null);
         setDraft(null);
       }
-      await loadAdmin();
-      if (userQuery.trim()) {
-        const data = await api.adminUsers(userQuery.trim());
-        setUsers(data.users || []);
-        setUserTotal(data.total || 0);
-      }
+      await loadAdmin(userPlan);
     } catch (err) {
       setMsg(err.message || "Could not delete that account.");
     } finally {
@@ -426,7 +439,18 @@ export default function Admin() {
       {tab === "accounts" && (
         <>
           <h1 className="landing-title">Accounts</h1>
-          <p className="landing-sub">{userTotal} {userTotal === 1 ? "account" : "accounts"} in the database. Search, edit plan, or delete.</p>
+          <p className="landing-sub">
+            {userPlan === "premium"
+              ? `${userTotal} ${userTotal === 1 ? "premium account" : "premium accounts"}. Search, edit plan, or delete.`
+              : userPlan === "free"
+                ? `${userTotal} ${userTotal === 1 ? "free account" : "free accounts"}. Search, edit plan, or delete.`
+                : `${userTotal} ${userTotal === 1 ? "account" : "accounts"} in the database. Search, edit plan, or delete.`}
+          </p>
+          <div className="admin-plan-filters" role="group" aria-label="Filter accounts by plan">
+            <TabButton id="all" tab={userPlan} setTab={filterUsers} setMsg={setMsg}>All</TabButton>
+            <TabButton id="premium" tab={userPlan} setTab={filterUsers} setMsg={setMsg}>Premium</TabButton>
+            <TabButton id="free" tab={userPlan} setTab={filterUsers} setMsg={setMsg}>Free</TabButton>
+          </div>
           <form className="admin-search" onSubmit={searchUsers}>
             <input
               className="auth-input"

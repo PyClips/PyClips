@@ -187,9 +187,9 @@ def admin_overview(request: Request) -> dict:
 
 
 @app.get("/api/admin/users")
-def admin_list_users(request: Request, q: str = "", limit: int = 100, offset: int = 0) -> dict:
+def admin_list_users(request: Request, q: str = "", plan: str = "all", limit: int = 100, offset: int = 0) -> dict:
     admin.require_admin(request)
-    return admin.list_users(q=q, limit=limit, offset=offset)
+    return admin.list_users(q=q, plan=plan, limit=limit, offset=offset)
 
 
 @app.patch("/api/admin/users/{user_id}")

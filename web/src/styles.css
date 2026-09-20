@@ -441,6 +441,7 @@ a.brand-hero { color: inherit; text-decoration: none; cursor: pointer; }
 .admin-stat-n { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; }
 .admin-search { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
 .admin-search .auth-input { flex: 1; }
+.admin-plan-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .admin-table-wrap { overflow-x: auto; }
 .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .admin-table th {

@@ -415,18 +415,25 @@ def _get_user_or_404(user_id: int):
     return row
 
 
-def list_users(q: str = "", limit: int = 100, offset: int = 0) -> dict:
+def list_users(q: str = "", plan: str = "all", limit: int = 100, offset: int = 0) -> dict:
     limit = min(max(int(limit), 1), 500)
     offset = max(int(offset), 0)
+    plan_key = (plan or "all").strip().lower()
+    if plan_key not in ("all", "premium", "free"):
+        raise HTTPException(status_code=400, detail="Plan filter must be all, premium, or free.")
     needle = (q or "").strip().lower()
     conn = db.get_conn()
+    clauses: list[str] = []
+    args: list = []
     if needle:
         like = f"%{needle}%"
-        where = "WHERE lower(email) LIKE ? OR lower(COALESCE(username, '')) LIKE ?"
-        args: tuple = (like, like)
-    else:
-        where = ""
-        args = ()
+        clauses.append("(lower(email) LIKE ? OR lower(COALESCE(username, '')) LIKE ?)")
+        args.extend([like, like])
+    if plan_key == "premium":
+        clauses.append("plan = 'premium'")
+    elif plan_key == "free":
+        clauses.append("(plan IS NULL OR TRIM(plan) = '' OR plan != 'premium')")
+    where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
     total = int(conn.execute(f"SELECT COUNT(*) AS n FROM users {where}", args).fetchone()["n"])
     rows = conn.execute(
         f"""SELECT * FROM users {where}
@@ -437,6 +444,7 @@ def list_users(q: str = "", limit: int = 100, offset: int = 0) -> dict:
     return {
         "users": [_admin_user(row) for row in rows],
         "total": total,
+        "plan": plan_key,
         "limit": limit,
         "offset": offset,
     }
