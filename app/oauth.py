@@ -15,6 +15,7 @@ from urllib.parse import urlencode
 
 import requests
 from fastapi import HTTPException, Request
+from pydantic import BaseModel, Field
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from . import auth, tickets
@@ -28,6 +29,11 @@ _LOCK = threading.Lock()
 _GOOGLE_AUTH = "https://accounts.google.com/o/oauth2/v2/auth"
 _GOOGLE_TOKEN = "https://oauth2.googleapis.com/token"
 _GOOGLE_USER = "https://openidconnect.googleapis.com/v1/userinfo"
+_GOOGLE_TOKENINFO = "https://oauth2.googleapis.com/tokeninfo"
+
+
+class GoogleIdBody(BaseModel):
+    id_token: str = Field(min_length=20, max_length=8192)
 
 
 def _b64url(raw: bytes) -> str:
@@ -178,3 +184,40 @@ def finish_google(request: Request, code: Optional[str], state: Optional[str], e
     resp = RedirectResponse(url=dest, status_code=302)
     auth.set_session_cookie(resp, user)
     return resp
+
+
+def session_from_google_id_token(id_token: str) -> dict:
+    """Phone Google Sign-In: verify an ID token and return a desktop-style session."""
+    token = (id_token or "").strip()
+    if len(token) < 20:
+        raise HTTPException(status_code=400, detail="Missing Google sign-in.")
+    cfg = load_google_config()
+    if not cfg["google_client_id"]:
+        raise HTTPException(
+            status_code=503,
+            detail="Google login is not set up on pyclips.in.",
+        )
+    try:
+        info = requests.get(_GOOGLE_TOKENINFO, params={"id_token": token}, timeout=_TIMEOUT)
+    except requests.RequestException as exc:
+        raise HTTPException(status_code=502, detail="Could not reach Google to check this sign-in.") from exc
+    if info.status_code != 200:
+        raise HTTPException(status_code=401, detail="Google sign-in was not accepted. Try again.")
+    try:
+        data = info.json()
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail="Google sign-in was not accepted. Try again.") from exc
+    aud = str(data.get("aud") or "").strip()
+    if aud != cfg["google_client_id"]:
+        raise HTTPException(status_code=401, detail="Google sign-in was not accepted. Try again.")
+    iss = str(data.get("iss") or "").strip()
+    if iss not in ("https://accounts.google.com", "accounts.google.com"):
+        raise HTTPException(status_code=401, detail="Google sign-in was not accepted. Try again.")
+    verified = str(data.get("email_verified") or "").lower() in ("true", "1")
+    if not verified:
+        raise HTTPException(status_code=400, detail="Google did not verify that email.")
+    gid = str(data.get("sub") or "").strip()
+    email = (data.get("email") or "").strip()
+    name = str(data.get("name") or data.get("given_name") or "").strip()
+    user = auth.upsert_google_user(gid, email, name)
+    return tickets.session_for_user(int(user["id"]))

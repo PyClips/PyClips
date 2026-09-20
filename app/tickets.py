@@ -252,11 +252,19 @@ def login_claim(ticket: str) -> dict:
     uid = rec.get("user_id")
     if not uid:
         return {"status": "waiting"}
-    row = db.get_conn().execute("SELECT * FROM users WHERE id = ?", (int(uid),)).fetchone()
-    if not row:
+    try:
+        return session_for_user(int(uid))
+    except HTTPException:
         return {"status": "waiting"}
-    sub = auth.subscription_for(int(uid))
-    token = ensure_desktop_sync_token(int(uid))
+
+
+def session_for_user(user_id: int) -> dict:
+    uid = int(user_id)
+    row = db.get_conn().execute("SELECT * FROM users WHERE id = ?", (uid,)).fetchone()
+    if not row:
+        raise HTTPException(status_code=401, detail="Please log in.")
+    sub = auth.subscription_for(uid)
+    token = ensure_desktop_sync_token(uid)
     return {
         "status": "ok",
         "email": row["email"],

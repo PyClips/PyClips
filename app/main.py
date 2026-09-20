@@ -284,6 +284,11 @@ def desktop_login_claim(ticket: str = "") -> dict:
     return tickets.login_claim(ticket)
 
 
+@app.post("/api/desktop/google-id-token")
+def desktop_google_id_token(body: oauth.GoogleIdBody) -> dict:
+    return oauth.session_from_google_id_token(body.id_token)
+
+
 @app.get("/favicon.ico")
 def favicon():
     from .config import ROOT
