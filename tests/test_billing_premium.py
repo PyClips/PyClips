@@ -94,6 +94,26 @@ class PremiumEntitlementTests(unittest.TestCase):
         self.assertEqual(row["plan"], "free")
         self.assertIsNone(row["premium_until"])
 
+    def test_admin_grant_survives_repair(self):
+        uid = self._insert_user()
+        until = (datetime.now(timezone.utc) + timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        conn = db.get_conn()
+        conn.execute(
+            "UPDATE users SET plan = 'premium', billing_plan = 'admin', premium_until = ? WHERE id = ?",
+            (until, uid),
+        )
+        conn.commit()
+        with patch.object(billing, "_restore_from_razorpay", return_value=False):
+            with patch.object(billing, "_restore_from_local", return_value=False):
+                billing.repair_premium(uid)
+        row = conn.execute(
+            "SELECT plan, billing_plan, premium_until FROM users WHERE id = ?",
+            (uid,),
+        ).fetchone()
+        self.assertEqual(row["plan"], "premium")
+        self.assertEqual(row["billing_plan"], "admin")
+        self.assertEqual(row["premium_until"], until)
+
 
 if __name__ == "__main__":
     unittest.main()

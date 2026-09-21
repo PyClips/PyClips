@@ -538,6 +538,7 @@ export default function Admin() {
                   Billing
                   <select className="auth-input" value={draft.billing_plan} onChange={(e) => setDraft({ ...draft, billing_plan: e.target.value })}>
                     <option value="">none</option>
+                    <option value="admin">admin grant</option>
                     <option value="monthly">monthly</option>
                     <option value="yearly">yearly</option>
                     <option value="coupon">coupon</option>
@@ -547,6 +548,7 @@ export default function Admin() {
                   Premium until
                   <input className="auth-input" type="date" value={draft.premium_until} onChange={(e) => setDraft({ ...draft, premium_until: e.target.value })} />
                 </label>
+                <p className="note">Premium saved here stays until that date. Leave billing on none (or admin grant) so opening the app does not undo it.</p>
                 <label className="auth-label">
                   Clips used
                   <input className="auth-input" type="number" min={0} value={draft.videos_used} onChange={(e) => setDraft({ ...draft, videos_used: e.target.value })} required />

@@ -722,13 +722,20 @@ class AdminCouponTests(unittest.TestCase):
                 "plan": "premium",
                 "premium_until": "2030-06-15",
                 "videos_used": 4,
-                "billing_plan": "coupon",
+                "billing_plan": "",
             },
         )
         self.assertEqual(patched.status_code, 200, patched.text)
         self.assertEqual(patched.json()["plan"], "premium")
         self.assertEqual(patched.json()["videos_used"], 4)
+        self.assertEqual(patched.json()["billing_plan"], "admin")
         self.assertTrue(str(patched.json()["premium_until"]).startswith("2030-06-15"))
+        from app import billing as billing_mod
+
+        billing_mod.repair_premium(google["id"])
+        still = self.client.get(f"/api/admin/users?q={google['email']}")
+        self.assertEqual(still.json()["users"][0]["plan"], "premium")
+        self.assertEqual(still.json()["users"][0]["billing_plan"], "admin")
         clash = self.client.patch(
             f"/api/admin/users/{google['id']}",
             json={"email": "ada@example.com"},

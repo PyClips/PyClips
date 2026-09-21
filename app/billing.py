@@ -595,8 +595,18 @@ def _restore_from_razorpay(user_id: int) -> bool:
 
 
 def _premium_entitlement_active(user_id: int) -> bool:
-    """True when this account has proof of paid Premium (payment, coupon, or paid Razorpay sub)."""
+    """True when this account has proof of Premium (admin grant, payment, coupon, or paid Razorpay sub)."""
     conn = db.get_conn()
+    row = conn.execute(
+        "SELECT plan, billing_plan, premium_until FROM users WHERE id = ?",
+        (user_id,),
+    ).fetchone()
+    if row:
+        kind = str(row["billing_plan"] or "").strip().lower()
+        if kind == "admin" and str(row["plan"] or "") == "premium":
+            until = auth.parse_until(row["premium_until"])
+            if until is None or until > _now():
+                return True
     now = _now()
     for pay in conn.execute(
         "SELECT amount_paise, kind, created_at FROM payments WHERE user_id = ?",
