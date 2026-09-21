@@ -517,29 +517,22 @@ def update_user(user_id: int, body: UpdateUserBody) -> dict:
     if "premium_until" in data:
         fields.append("premium_until = ?")
         args.append(_parse_admin_until(data.get("premium_until")))
-    # Admin Premium with no Razorpay/coupon is still a grant. Stamp billing_plan=admin
-    # so repair_premium does not wipe the row the next time they open the app.
-    if "plan" in data or "billing_plan" in data or "premium_until" in data:
-        current = _get_user_or_404(user_id)
-        next_plan = (data.get("plan") if "plan" in data else current["plan"] or "free")
-        next_plan = str(next_plan or "free").strip().lower()
-        if "billing_plan" in data:
-            next_bill = billing_plan
+    # This route is an admin grant. Stamp billing_plan=admin whenever Premium is
+    # saved here, otherwise repair_premium treats it as unpaid and wipes the row.
+    current = _get_user_or_404(user_id)
+    next_plan = str((data.get("plan") if "plan" in data else current["plan"]) or "free").strip().lower()
+    if next_plan == "premium" and ("plan" in data or "billing_plan" in data or "premium_until" in data):
+        if "billing_plan = ?" in fields:
+            args[fields.index("billing_plan = ?")] = "admin"
         else:
-            next_bill = (current["billing_plan"] or "").strip().lower() or None
-        if next_plan == "premium" and next_bill in (None, "", "none"):
-            next_bill = "admin"
-            if "billing_plan" in data:
-                args[fields.index("billing_plan = ?")] = "admin"
-            else:
-                fields.append("billing_plan = ?")
-                args.append("admin")
-        elif next_plan == "free" and next_bill == "admin":
-            if "billing_plan" in data:
-                args[fields.index("billing_plan = ?")] = None
-            else:
-                fields.append("billing_plan = ?")
-                args.append(None)
+            fields.append("billing_plan = ?")
+            args.append("admin")
+    elif next_plan == "free" and "plan" in data:
+        if "billing_plan = ?" not in fields:
+            fields.append("billing_plan = ?")
+            args.append(None)
+        elif (data.get("billing_plan") or "").strip().lower() in ("", "none", "admin"):
+            args[fields.index("billing_plan = ?")] = None
     if not fields:
         return _admin_user(_get_user_or_404(user_id))
     args.append(int(user_id))

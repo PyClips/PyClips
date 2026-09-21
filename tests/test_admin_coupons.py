@@ -722,7 +722,7 @@ class AdminCouponTests(unittest.TestCase):
                 "plan": "premium",
                 "premium_until": "2030-06-15",
                 "videos_used": 4,
-                "billing_plan": "",
+                "billing_plan": "monthly",
             },
         )
         self.assertEqual(patched.status_code, 200, patched.text)

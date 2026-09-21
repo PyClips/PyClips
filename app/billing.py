@@ -658,8 +658,13 @@ def _premium_entitlement_active(user_id: int) -> bool:
 
 def _revoke_unpaid_premium(user_id: int) -> bool:
     conn = db.get_conn()
-    row = conn.execute("SELECT plan, premium_until FROM users WHERE id = ?", (user_id,)).fetchone()
+    row = conn.execute(
+        "SELECT plan, billing_plan, premium_until FROM users WHERE id = ?",
+        (user_id,),
+    ).fetchone()
     if not row or row["plan"] != "premium":
+        return False
+    if str(row["billing_plan"] or "").strip().lower() == "admin":
         return False
     until = auth.parse_until(row["premium_until"])
     if until is None or until <= _now():
@@ -685,10 +690,12 @@ def repair_premium(user_id: int) -> bool:
         return False
     conn = db.get_conn()
     row = conn.execute(
-        "SELECT plan, premium_until FROM users WHERE id = ?",
+        "SELECT plan, billing_plan, premium_until FROM users WHERE id = ?",
         (uid,),
     ).fetchone()
     if not row:
+        return False
+    if str(row["billing_plan"] or "").strip().lower() == "admin":
         return False
     until = auth.parse_until(row["premium_until"])
     now = _now()

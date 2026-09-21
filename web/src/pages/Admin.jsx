@@ -215,17 +215,20 @@ export default function Admin() {
     setMsg("");
     setBusy(true);
     try {
+      const savedPlan = draft.plan;
       await api.adminUpdateUser(editingId, {
         email: draft.email.trim(),
         username: draft.username.trim(),
-        plan: draft.plan,
-        billing_plan: draft.billing_plan,
+        plan: savedPlan,
+        billing_plan: savedPlan === "premium" ? "admin" : "",
         videos_used: Number(draft.videos_used) || 0,
         premium_until: draft.premium_until,
       });
       setEditingId(null);
       setDraft(null);
-      await loadAdmin(userPlan);
+      const nextFilter = userPlan !== "all" && savedPlan !== userPlan ? "all" : userPlan;
+      setUserPlan(nextFilter);
+      await loadAdmin(nextFilter);
       setMsg("Account saved.");
     } catch (err) {
       setMsg(err.message || "Could not save that account.");
