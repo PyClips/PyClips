@@ -664,7 +664,7 @@ def _revoke_unpaid_premium(user_id: int) -> bool:
     ).fetchone()
     if not row or row["plan"] != "premium":
         return False
-    if str(row["billing_plan"] or "").strip().lower() == "admin":
+    if str(row["billing_plan"] or "").strip().lower() in ("admin", "affiliate"):
         return False
     until = auth.parse_until(row["premium_until"])
     if until is None or until <= _now():
@@ -695,7 +695,7 @@ def repair_premium(user_id: int) -> bool:
     ).fetchone()
     if not row:
         return False
-    if str(row["billing_plan"] or "").strip().lower() == "admin":
+    if str(row["billing_plan"] or "").strip().lower() in ("admin", "affiliate"):
         return False
     until = auth.parse_until(row["premium_until"])
     now = _now()
@@ -1120,3 +1120,116 @@ def pricing_for(request: Request | None = None, currency: str = "") -> dict:
         "price_yearly": yearly_label,
         "can_override": True,
     }
+
+
+def _pick_email(payload: dict) -> str:
+    customer = payload.get("customer") if isinstance(payload.get("customer"), dict) else {}
+    contact = payload.get("contact") if isinstance(payload.get("contact"), dict) else {}
+    for value in (
+        payload.get("email"),
+        customer.get("email"),
+        contact.get("email"),
+        (payload.get("data") or {}).get("email") if isinstance(payload.get("data"), dict) else None,
+    ):
+        if isinstance(value, str) and "@" in value:
+            return value.strip()
+    data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+    nested = data.get("customer") if isinstance(data.get("customer"), dict) else {}
+    email = nested.get("email")
+    return email.strip() if isinstance(email, str) else ""
+
+
+def _pick_order(payload: dict) -> str:
+    data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+    for value in (
+        payload.get("order_id"),
+        payload.get("orderId"),
+        payload.get("id"),
+        data.get("order_id"),
+        data.get("id"),
+    ):
+        if value:
+            return str(value).strip()[:80]
+    return ""
+
+
+def grant_affiliate_month(email: str, order_id: str = "") -> dict:
+    """One month of Premium for a ₹99 creator-link sale. Does not change the ₹29 app price."""
+    stored = auth.tidy_email(email)
+    if not stored or "@" not in stored:
+        raise HTTPException(status_code=400, detail="Need the buyer email.")
+    order_id = (order_id or "").strip() or hashlib.sha256(f"{stored}:{_now().isoformat()}".encode()).hexdigest()[:16]
+    pay_id = f"systeme:{order_id}"[:80]
+    conn = db.get_conn()
+    already = conn.execute(
+        "SELECT id FROM payments WHERE razorpay_payment_id = ?",
+        (pay_id,),
+    ).fetchone()
+    if already:
+        row = auth.find_user_row(conn, stored)
+        return {
+            "ok": True,
+            "email": stored,
+            "created": False,
+            "order_id": order_id,
+            "premium_until": (row["premium_until"] if row else None),
+            "duplicate": True,
+        }
+    row = auth.find_user_row(conn, stored)
+    created = False
+    if row is None:
+        user = auth.create_user(stored, secrets_password())
+        row = auth.find_user_row(conn, stored)
+        created = True
+        user_id = int(user["id"])
+    else:
+        user_id = int(row["id"])
+    current = auth.parse_until(row["premium_until"] if row else None)
+    start = current if current and current > _now() else _now()
+    until = start + timedelta(days=MONTHLY_DAYS)
+    ensure_premium_until(user_id, until, billing_plan="affiliate", provider="systeme")
+    try:
+        conn.execute(
+            """INSERT INTO payments (user_id, razorpay_payment_id, razorpay_subscription_id, amount_paise, kind, provider, created_at)
+               VALUES (?, ?, '', 9900, 'affiliate', 'systeme', ?)""",
+            (user_id, pay_id, _now().strftime("%Y-%m-%dT%H:%M:%SZ")),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.rollback()
+    return {
+        "ok": True,
+        "email": stored,
+        "created": created,
+        "order_id": order_id,
+        "premium_until": until.strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+
+
+def secrets_password() -> str:
+    import secrets
+    return secrets.token_urlsafe(18)
+
+
+def claim_affiliate_password(email: str, order_id: str, password: str) -> dict:
+    """Buyer sets a password using the order number from the systeme.io receipt."""
+    stored = auth.tidy_email(email)
+    if len(password or "") < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
+    pay_id = f"systeme:{(order_id or '').strip()}"[:80]
+    conn = db.get_conn()
+    row = auth.find_user_row(conn, stored)
+    if not row:
+        raise HTTPException(status_code=404, detail="No purchase found for that email.")
+    hit = conn.execute(
+        "SELECT id FROM payments WHERE user_id = ? AND razorpay_payment_id = ? AND provider = 'systeme'",
+        (int(row["id"]), pay_id),
+    ).fetchone()
+    if not hit:
+        raise HTTPException(status_code=404, detail="That order number does not match this email.")
+    conn.execute(
+        "UPDATE users SET password_hash = ? WHERE id = ?",
+        (auth._hash_password(password), int(row["id"])),
+    )
+    conn.commit()
+    return {"ok": True, "email": stored}

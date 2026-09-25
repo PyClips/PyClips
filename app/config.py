@@ -127,6 +127,7 @@ def settings() -> dict:
         # USD plans for Razorpay International (Dashboard → Subscriptions → Plans, currency USD).
         "plan_monthly_usd": (os.environ.get("RAZORPAY_PLAN_MONTHLY_USD") or "").strip(),
         "plan_yearly_usd": (os.environ.get("RAZORPAY_PLAN_YEARLY_USD") or "").strip(),
+        "systeme_secret": (os.environ.get("SYSTEME_WEBHOOK_SECRET") or "").strip(),
     }
 
 

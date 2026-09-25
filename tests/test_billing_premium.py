@@ -114,6 +114,24 @@ class PremiumEntitlementTests(unittest.TestCase):
         self.assertEqual(row["billing_plan"], "admin")
         self.assertEqual(row["premium_until"], until)
 
+    def test_affiliate_month_survives_repair(self):
+        billing.grant_affiliate_month("buyer@example.com", "order-99")
+        row = db.get_conn().execute(
+            "SELECT id, plan, billing_plan FROM users WHERE email = ?",
+            ("buyer@example.com",),
+        ).fetchone()
+        self.assertEqual(row["plan"], "premium")
+        self.assertEqual(row["billing_plan"], "affiliate")
+        with patch.object(billing, "_restore_from_razorpay", return_value=False):
+            billing.repair_premium(int(row["id"]))
+        again = db.get_conn().execute(
+            "SELECT plan FROM users WHERE id = ?",
+            (int(row["id"]),),
+        ).fetchone()
+        self.assertEqual(again["plan"], "premium")
+        second = billing.grant_affiliate_month("buyer@example.com", "order-99")
+        self.assertTrue(second.get("duplicate"))
+
 
 if __name__ == "__main__":
     unittest.main()

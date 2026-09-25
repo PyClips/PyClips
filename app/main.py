@@ -229,6 +229,36 @@ async def webhook(request: Request) -> dict:
     return billing.apply_webhook(raw, sig)
 
 
+class AffiliateClaim(BaseModel):
+    email: str
+    order_id: str
+    password: str
+
+
+@app.post("/api/billing/systeme")
+async def systeme_sale(request: Request) -> dict:
+    """₹99 creator-link payment. Grants one month on the normal app. ₹29 in the app is unchanged."""
+    import hmac
+    secret = (billing.settings().get("systeme_secret") or "").strip()
+    given = request.headers.get("X-PyClips-Affiliate-Secret") or ""
+    if not secret or not hmac.compare_digest(given, secret):
+        raise HTTPException(status_code=401, detail="Unauthorized.")
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
+    if not isinstance(payload, dict):
+        payload = {}
+    email = billing._pick_email(payload)
+    order_id = billing._pick_order(payload)
+    return billing.grant_affiliate_month(email, order_id)
+
+
+@app.post("/api/billing/systeme/claim")
+def systeme_claim(body: AffiliateClaim) -> dict:
+    return billing.claim_affiliate_password(body.email, body.order_id, body.password)
+
+
 @app.post("/api/desktop/begin")
 def desktop_begin(body: tickets.BeginBody) -> dict:
     return tickets.begin(body)
