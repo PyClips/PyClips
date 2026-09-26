@@ -1140,17 +1140,70 @@ def _pick_email(payload: dict) -> str:
 
 
 def _pick_order(payload: dict) -> str:
+    order = payload.get("order") if isinstance(payload.get("order"), dict) else {}
     data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
     for value in (
         payload.get("order_id"),
         payload.get("orderId"),
+        order.get("id"),
         payload.get("id"),
         data.get("order_id"),
         data.get("id"),
     ):
-        if value:
+        if value is not None and str(value).strip():
             return str(value).strip()[:80]
     return ""
+
+
+def _systeme_normalize(payload: dict) -> str:
+    """Match systeme.io's signed body: compact JSON, unicode escapes, escaped slashes."""
+    return json.dumps(payload, ensure_ascii=True, separators=(",", ":")).replace("/", "\\/")
+
+
+def verify_systeme_signature(raw: bytes, signature: str, secret: str) -> bool:
+    """HMAC-SHA256 of the normalized JSON body vs X-Webhook-Signature."""
+    if not secret or not signature:
+        return False
+    try:
+        payload = json.loads(raw.decode("utf-8") or "{}")
+    except Exception:
+        return False
+    if not isinstance(payload, dict):
+        return False
+    expected = hmac.new(
+        secret.encode("utf-8"),
+        _systeme_normalize(payload).encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature.strip())
+
+
+def is_affiliate_monthly(payload: dict) -> bool:
+    """True only for the ₹99 creator-link month. Lifetime ₹599 must not get a month grant."""
+    plan = payload.get("pricePlan") if isinstance(payload.get("pricePlan"), dict) else {}
+    if not plan and isinstance(payload.get("data"), dict):
+        nested = payload["data"].get("pricePlan")
+        plan = nested if isinstance(nested, dict) else {}
+    label = f"{plan.get('name') or ''} {plan.get('innerName') or ''}".lower()
+    if "lifetime" in label:
+        return False
+    if "month" in label:
+        return True
+    try:
+        amount = int(plan.get("amount") or 0)
+    except (TypeError, ValueError):
+        amount = 0
+    # systeme.io may send rupees (99) or paise (9900).
+    if amount in (99, 9900):
+        return True
+    if amount in (599, 59900):
+        return False
+    if plan.get("recurringOptions") or str(plan.get("type") or "").lower() in (
+        "subscription",
+        "recurring",
+    ):
+        return True
+    return False
 
 
 def grant_affiliate_month(email: str, order_id: str = "") -> dict:

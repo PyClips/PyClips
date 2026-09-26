@@ -132,6 +132,43 @@ class PremiumEntitlementTests(unittest.TestCase):
         second = billing.grant_affiliate_month("buyer@example.com", "order-99")
         self.assertTrue(second.get("duplicate"))
 
+    def test_systeme_signature_and_monthly_only(self):
+        secret = "test-systeme-secret"
+        monthly = {
+            "customer": {"email": "month@example.com"},
+            "order": {"id": 1001},
+            "pricePlan": {
+                "name": "Pyclips Monthly Access",
+                "type": "subscription",
+                "amount": 99,
+                "currency": "inr",
+            },
+        }
+        lifetime = {
+            "customer": {"email": "life@example.com"},
+            "order": {"id": 1002},
+            "pricePlan": {
+                "name": "Pyclips Lifetime Access",
+                "type": "one_shot",
+                "amount": 599,
+                "currency": "inr",
+            },
+        }
+        self.assertTrue(billing.is_affiliate_monthly(monthly))
+        self.assertFalse(billing.is_affiliate_monthly(lifetime))
+        import hashlib
+        import hmac
+        import json
+
+        body = json.dumps(monthly).encode("utf-8")
+        sig = hmac.new(
+            secret.encode("utf-8"),
+            billing._systeme_normalize(monthly).encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+        self.assertTrue(billing.verify_systeme_signature(body, sig, secret))
+        self.assertFalse(billing.verify_systeme_signature(body, "bad", secret))
+
 
 if __name__ == "__main__":
     unittest.main()

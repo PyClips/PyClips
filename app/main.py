@@ -237,20 +237,37 @@ class AffiliateClaim(BaseModel):
 
 @app.post("/api/billing/systeme")
 async def systeme_sale(request: Request) -> dict:
-    """₹99 creator-link payment. Grants one month on the normal app. ₹29 in the app is unchanged."""
+    """Creator-link sale from systeme.io. ₹99 → one month Premium. ₹599 lifetime is ignored here."""
     import hmac
+    import json as _json
+
     secret = (billing.settings().get("systeme_secret") or "").strip()
-    given = request.headers.get("X-PyClips-Affiliate-Secret") or ""
-    if not secret or not hmac.compare_digest(given, secret):
+    raw = await request.body()
+    signature = request.headers.get("X-Webhook-Signature") or ""
+    legacy = request.headers.get("X-PyClips-Affiliate-Secret") or ""
+    authorized = False
+    if secret and signature:
+        authorized = billing.verify_systeme_signature(raw, signature, secret)
+    elif secret and legacy:
+        authorized = hmac.compare_digest(legacy, secret)
+    if not authorized:
         raise HTTPException(status_code=401, detail="Unauthorized.")
     try:
-        payload = await request.json()
+        payload = _json.loads(raw.decode("utf-8") or "{}")
     except Exception:
         payload = {}
     if not isinstance(payload, dict):
         payload = {}
     email = billing._pick_email(payload)
     order_id = billing._pick_order(payload)
+    if not billing.is_affiliate_monthly(payload):
+        return {
+            "ok": True,
+            "skipped": True,
+            "reason": "not_monthly",
+            "email": email or None,
+            "order_id": order_id or None,
+        }
     return billing.grant_affiliate_month(email, order_id)
 
 
