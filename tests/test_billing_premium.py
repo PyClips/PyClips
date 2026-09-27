@@ -132,6 +132,12 @@ class PremiumEntitlementTests(unittest.TestCase):
         second = billing.grant_affiliate_month("buyer@example.com", "order-99")
         self.assertTrue(second.get("duplicate"))
 
+    def test_inr_amounts_map_to_plan_length(self):
+        self.assertEqual(billing._days_for_amount(9900), (30, "monthly"))
+        self.assertEqual(billing._days_for_amount(2900), (30, "monthly"))
+        self.assertEqual(billing._days_for_amount(59900), (365, "yearly"))
+        self.assertEqual(billing._days_for_amount(19900), (365, "yearly"))
+
     def test_systeme_signature_and_monthly_only(self):
         secret = "test-systeme-secret"
         monthly = {

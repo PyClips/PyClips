@@ -19,7 +19,7 @@ PyClips turns long videos into captioned short-form clips. Paste a link or drop 
 
 The desktop app follows Import → Clip → Soundtrack → Captions → Style → Review → Export: set up the clip, pick music, style captions, then bake and download. Accounts and Premium live on the web at [pyclips.in](https://pyclips.in) — sign in with Google, then use the same account in the Windows app.
 
-**Free** includes a limited number of clips. **Premium** unlocks unlimited bakes and the full caption library. India is billed in INR (₹29 / month or ₹199 / year). Elsewhere is billed in USD ($2.99 / month or $29.99 / year) through Razorpay.
+**Free** includes a limited number of clips. **Premium** unlocks unlimited bakes and the full caption library. India is billed in INR (₹99 / month or ₹599 / year). Elsewhere is billed in USD ($2.99 / month or $29.99 / year) through Razorpay.
 
 - Website: [pyclips.in](https://pyclips.in)
 - X: [x.com/Py_Clips](https://x.com/Py_Clips)

@@ -124,7 +124,7 @@ const FAQS = [
   },
   {
     q: "How does Premium work?",
-    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹29 / month or ₹199 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited bakes and premium features in the desktop app after you sign in with the same account.",
+    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹99 / month or ₹599 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited bakes and premium features in the desktop app after you sign in with the same account.",
   },
   {
     q: "Can I use PyClips without Premium?",
@@ -157,7 +157,7 @@ export default function Landing({ user }) {
         setPricing(
           currencyOverride === "USD"
             ? { currency: "USD", monthly_display: "$2.99", yearly_display: "$29.99" }
-            : { currency: "INR", monthly_display: "₹29", yearly_display: "₹199" },
+            : { currency: "INR", monthly_display: "₹99", yearly_display: "₹599" },
         );
       });
     return () => { live = false; };
@@ -313,8 +313,8 @@ export default function Landing({ user }) {
   }
 
   const isUsd = (pricing?.currency || currencyOverride) === "USD";
-  const monthlyPrice = pricing?.monthly_display || (isUsd ? "$2.99" : "₹29");
-  const yearlyPrice = pricing?.yearly_display || (isUsd ? "$29.99" : "₹199");
+  const monthlyPrice = pricing?.monthly_display || (isUsd ? "$2.99" : "₹99");
+  const yearlyPrice = pricing?.yearly_display || (isUsd ? "$29.99" : "₹599");
   const currencyHref = `/?currency=${isUsd ? "INR" : "USD"}#pricing`;
   const payHref = `/pay?currency=${isUsd ? "USD" : "INR"}`;
 

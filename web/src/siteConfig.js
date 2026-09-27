@@ -2,7 +2,7 @@
 export const DOWNLOAD_URL = "";
 export const MICROSOFT_STORE_URL = "https://apps.microsoft.com/detail/9PBTL4Z79XTQ";
 
-/** Creator-link checkout on systeme.io. Monthly ₹99 is not the in-app ₹29 plan. */
+/** Creator-link checkout on systeme.io (₹99 monthly, ₹599 lifetime unlocked build). */
 export const SYSTEME_MONTHLY_URL = "https://checkout.pyclips.in/monthly";
 export const SYSTEME_LIFETIME_URL = "https://checkout.pyclips.in/lifetime";
 

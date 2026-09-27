@@ -26,6 +26,7 @@ from .config import (
     YEARLY_CENTS,
     YEARLY_DAYS,
     YEARLY_PAISE,
+    YEARLY_PAISE_MIN,
     razorpay_intl_ready,
     razorpay_ready,
     settings,
@@ -315,7 +316,7 @@ def _days_for_amount(amount: int, kind: str = "", *, currency: str = "INR") -> t
         if int(amount or 0) >= YEARLY_CENTS:
             return YEARLY_DAYS, "yearly"
         return MONTHLY_DAYS, "monthly"
-    if int(amount or 0) >= YEARLY_PAISE:
+    if int(amount or 0) >= YEARLY_PAISE_MIN:
         return YEARLY_DAYS, "yearly"
     return MONTHLY_DAYS, "monthly"
 
@@ -1090,10 +1091,10 @@ def pricing_for(request: Request | None = None, currency: str = "") -> dict:
     usd_ok = razorpay_intl_ready(cfg)
     if cur == CURRENCY:
         enabled = inr_ok
-        monthly_display = "₹29"
-        yearly_display = "₹199"
-        monthly_label = "₹29 / month"
-        yearly_label = "₹199 / year"
+        monthly_display = "₹99"
+        yearly_display = "₹599"
+        monthly_label = "₹99 / month"
+        yearly_label = "₹599 / year"
         amount_monthly = MONTHLY_PAISE
         amount_yearly = YEARLY_PAISE
     else:
@@ -1207,7 +1208,7 @@ def is_affiliate_monthly(payload: dict) -> bool:
 
 
 def grant_affiliate_month(email: str, order_id: str = "") -> dict:
-    """One month of Premium for a ₹99 creator-link sale. Does not change the ₹29 app price."""
+    """One month of Premium for a ₹99 creator-link sale on systeme.io."""
     stored = auth.tidy_email(email)
     if not stored or "@" not in stored:
         raise HTTPException(status_code=400, detail="Need the buyer email.")
