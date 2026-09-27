@@ -2,7 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../api.js";
 import SurfaceFrame from "../components/SurfaceFrame.jsx";
 import BrandLogo from "../components/BrandLogo.jsx";
-import { DOWNLOAD_URL, MICROSOFT_STORE_URL, SOCIALS } from "../siteConfig.js";
+import {
+  DOWNLOAD_URL,
+  MICROSOFT_STORE_URL,
+  SHOW_HERO_DOWNLOAD,
+  SHOW_PRICING_PANEL,
+  SOCIALS,
+  SYSTEME_LIFETIME_URL,
+  SYSTEME_MONTHLY_URL,
+} from "../siteConfig.js";
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -320,7 +328,7 @@ export default function Landing({ user }) {
         <nav className="landing-nav-links" aria-label="Page">
           <a href="#product">Product</a>
           <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
+          {SHOW_PRICING_PANEL && <a href="#pricing">Pricing</a>}
           <a href="#download">Download</a>
         </nav>
         <div className="landing-nav-actions">
@@ -352,7 +360,7 @@ export default function Landing({ user }) {
         <div className="landing-drawer" role="dialog" aria-label="Menu">
           <a href="#product" onClick={closeMenu}>Product</a>
           <a href="#features" onClick={closeMenu}>Features</a>
-          <a href="#pricing" onClick={closeMenu}>Pricing</a>
+          {SHOW_PRICING_PANEL && <a href="#pricing" onClick={closeMenu}>Pricing</a>}
           <a href="#download" onClick={closeMenu}>Download</a>
           {user ? (
             <a href="/account" onClick={closeMenu}>Account</a>
@@ -378,11 +386,19 @@ export default function Landing({ user }) {
             style captions, then bake and export shorts ready to post.
           </p>
           <div className="landing-hero-ctas">
-            <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary landing-btn-lg">
-              Download PyClips
-            </ExternalCta>
+            {SHOW_HERO_DOWNLOAD && (
+              <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary landing-btn-lg">
+                Download PyClips
+              </ExternalCta>
+            )}
             <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
               Microsoft Store
+            </ExternalCta>
+            <ExternalCta url={SYSTEME_MONTHLY_URL} className="landing-btn landing-btn-primary landing-btn-lg">
+              PyClips Monthly
+            </ExternalCta>
+            <ExternalCta url={SYSTEME_LIFETIME_URL} className="landing-btn landing-btn-primary landing-btn-lg">
+              PyClips Lifetime
             </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">
@@ -524,6 +540,7 @@ export default function Landing({ user }) {
           </ol>
         </section>
 
+        {SHOW_PRICING_PANEL && (
         <section className="landing-block reveal" id="pricing">
           <h2>Start creating with PyClips.</h2>
           <p className="landing-subhead">
@@ -576,6 +593,7 @@ export default function Landing({ user }) {
             </article>
           </div>
         </section>
+        )}
 
         <section className="landing-block landing-dl-block reveal" id="download">
           <h2>Get PyClips on Windows.</h2>
@@ -644,7 +662,7 @@ export default function Landing({ user }) {
         <nav aria-label="Footer">
           <a href="#product">Product</a>
           <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
+          {SHOW_PRICING_PANEL && <a href="#pricing">Pricing</a>}
           <a href="#download">Download</a>
           <a href="/privacy">Privacy</a>
           <a href="/login">Login</a>
