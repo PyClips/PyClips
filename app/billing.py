@@ -969,6 +969,15 @@ def apply_webhook(body: bytes, signature: str) -> dict:
         ).fetchone()
         if row:
             user_id = int(row["id"])
+    # systeme.io checkouts share this Razorpay account; their sale already granted Premium
+    # through /api/billing/systeme, so an email-only match here would add a second month.
+    ours = (
+        notes.get("product") == "pyclips_premium"
+        or bool(notes.get("user_id"))
+        or notes.get("plan") in ("monthly", "yearly")
+    )
+    if not user_id and not ours:
+        return {"status": "ignored", "reason": "not_pyclips_checkout"}
     if not user_id:
         email = str(
             pay_ent.get("email")

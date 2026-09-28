@@ -132,6 +132,36 @@ class PremiumEntitlementTests(unittest.TestCase):
         second = billing.grant_affiliate_month("buyer@example.com", "order-99")
         self.assertTrue(second.get("duplicate"))
 
+    def test_systeme_sale_not_doubled_by_razorpay_webhook(self):
+        import hashlib
+        import hmac
+        import json
+
+        billing.grant_affiliate_month("buyer2@example.com", "order-555")
+        before = db.get_conn().execute(
+            "SELECT premium_until FROM users WHERE email = ?", ("buyer2@example.com",)
+        ).fetchone()["premium_until"]
+        body = json.dumps({
+            "event": "payment.captured",
+            "payload": {"payment": {"entity": {
+                "id": "pay_systeme_1",
+                "amount": 9900,
+                "currency": "INR",
+                "status": "captured",
+                "email": "buyer2@example.com",
+                "notes": {},
+            }}},
+        }).encode("utf-8")
+        secret = "test-rzp-webhook"
+        sig = hmac.new(secret.encode("utf-8"), body, hashlib.sha256).hexdigest()
+        with patch.dict(os.environ, {"RAZORPAY_WEBHOOK_SECRET": secret}):
+            result = billing.apply_webhook(body, sig)
+        self.assertEqual(result.get("status"), "ignored")
+        after = db.get_conn().execute(
+            "SELECT premium_until FROM users WHERE email = ?", ("buyer2@example.com",)
+        ).fetchone()["premium_until"]
+        self.assertEqual(before, after)
+
     def test_inr_amounts_map_to_plan_length(self):
         self.assertEqual(billing._days_for_amount(9900), (30, "monthly"))
         self.assertEqual(billing._days_for_amount(2900), (30, "monthly"))
