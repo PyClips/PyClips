@@ -5,7 +5,10 @@ import BrandLogo from "../components/BrandLogo.jsx";
 import {
   DOWNLOAD_URL,
   MICROSOFT_STORE_URL,
+  SHOW_DOWNLOAD_SECTION,
+  SHOW_FINAL_CTA,
   SHOW_HERO_DOWNLOAD,
+  SHOW_HERO_STORE,
   SHOW_PRICING_PANEL,
   SOCIALS,
   SYSTEME_LIFETIME_URL,
@@ -317,6 +320,7 @@ export default function Landing({ user }) {
   const yearlyPrice = pricing?.yearly_display || (isUsd ? "$29.99" : "₹599");
   const currencyHref = `/?currency=${isUsd ? "INR" : "USD"}#pricing`;
   const payHref = `/pay?currency=${isUsd ? "USD" : "INR"}`;
+  const getHref = SHOW_DOWNLOAD_SECTION ? "#download" : "#get";
 
   return (
     <div className="landing landing-stitch" ref={pageRef}>
@@ -329,7 +333,7 @@ export default function Landing({ user }) {
           <a href="#product">Product</a>
           <a href="#features">Features</a>
           {SHOW_PRICING_PANEL && <a href="#pricing">Pricing</a>}
-          <a href="#download">Download</a>
+          {SHOW_DOWNLOAD_SECTION && <a href="#download">Download</a>}
         </nav>
         <div className="landing-nav-actions">
           {user ? (
@@ -342,7 +346,7 @@ export default function Landing({ user }) {
             </SurfaceFrame>
           )}
           <SurfaceFrame variant="primary" size="sm">
-            <a className="landing-btn landing-btn-primary" href="#download">Get PyClips</a>
+            <a className="landing-btn landing-btn-primary" href={getHref}>Get PyClips</a>
           </SurfaceFrame>
           <button
             type="button"
@@ -361,20 +365,20 @@ export default function Landing({ user }) {
           <a href="#product" onClick={closeMenu}>Product</a>
           <a href="#features" onClick={closeMenu}>Features</a>
           {SHOW_PRICING_PANEL && <a href="#pricing" onClick={closeMenu}>Pricing</a>}
-          <a href="#download" onClick={closeMenu}>Download</a>
+          {SHOW_DOWNLOAD_SECTION && <a href="#download" onClick={closeMenu}>Download</a>}
           {user ? (
             <a href="/account" onClick={closeMenu}>Account</a>
           ) : (
             <a href="/login" onClick={closeMenu}>Log in</a>
           )}
           <SurfaceFrame variant="primary" full>
-            <a className="landing-btn landing-btn-primary" href="#download" onClick={closeMenu}>Get PyClips</a>
+            <a className="landing-btn landing-btn-primary" href={getHref} onClick={closeMenu}>Get PyClips</a>
           </SurfaceFrame>
         </div>
       )}
 
       <main>
-        <section className="landing-hero">
+        <section className="landing-hero" id="get">
           <p className="landing-eyebrow">Windows desktop clip studio</p>
           <h1>
             Turn long videos into
@@ -391,9 +395,11 @@ export default function Landing({ user }) {
                 Download PyClips
               </ExternalCta>
             )}
-            <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
-              Microsoft Store
-            </ExternalCta>
+            {SHOW_HERO_STORE && (
+              <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
+                Microsoft Store
+              </ExternalCta>
+            )}
             <ExternalCta url={SYSTEME_MONTHLY_URL} className="landing-btn landing-btn-primary landing-btn-lg">
               PyClips Monthly
             </ExternalCta>
@@ -405,7 +411,6 @@ export default function Landing({ user }) {
             <li>Windows app</li>
             <li>Styled captions</li>
             <li>GPU optional</li>
-            <li>20 free clips</li>
           </ul>
           <div className="landing-hero-visual">
             <Shot
@@ -595,6 +600,7 @@ export default function Landing({ user }) {
         </section>
         )}
 
+        {SHOW_DOWNLOAD_SECTION && (
         <section className="landing-block landing-dl-block reveal" id="download">
           <h2>Get PyClips on Windows.</h2>
           <p className="landing-meta">Windows 10 / Windows 11</p>
@@ -623,6 +629,7 @@ export default function Landing({ user }) {
             </article>
           </div>
         </section>
+        )}
 
         <section className="landing-block landing-faq-block reveal" id="faq">
           <h2>Frequently asked questions</h2>
@@ -637,6 +644,7 @@ export default function Landing({ user }) {
           </div>
         </section>
 
+        {SHOW_FINAL_CTA && (
         <section className="landing-final reveal">
           <h2>Your next short is waiting.</h2>
           <p>Turn your long-form videos into polished short-form content with PyClips.</p>
@@ -649,6 +657,7 @@ export default function Landing({ user }) {
             </ExternalCta>
           </div>
         </section>
+        )}
       </main>
 
       <footer className="landing-foot">
@@ -663,7 +672,7 @@ export default function Landing({ user }) {
           <a href="#product">Product</a>
           <a href="#features">Features</a>
           {SHOW_PRICING_PANEL && <a href="#pricing">Pricing</a>}
-          <a href="#download">Download</a>
+          {SHOW_DOWNLOAD_SECTION && <a href="#download">Download</a>}
           <a href="/privacy">Privacy</a>
           <a href="/login">Login</a>
         </nav>

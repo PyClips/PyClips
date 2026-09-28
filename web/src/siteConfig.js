@@ -8,7 +8,10 @@ export const SYSTEME_LIFETIME_URL = "https://checkout.pyclips.in/lifetime";
 
 /** Temporarily hidden on the landing page; flip back to true to show again. */
 export const SHOW_HERO_DOWNLOAD = false;
+export const SHOW_HERO_STORE = false;
 export const SHOW_PRICING_PANEL = false;
+export const SHOW_DOWNLOAD_SECTION = false;
+export const SHOW_FINAL_CTA = false;
 
 export const SITE_URL = "https://pyclips.in";
 
