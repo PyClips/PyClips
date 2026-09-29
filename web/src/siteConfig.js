@@ -12,6 +12,7 @@ export const SHOW_HERO_STORE = false;
 export const SHOW_PRICING_PANEL = false;
 export const SHOW_DOWNLOAD_SECTION = false;
 export const SHOW_FINAL_CTA = false;
+export const SHOW_ACCOUNT_BUTTON = false;
 
 export const SITE_URL = "https://pyclips.in";
 

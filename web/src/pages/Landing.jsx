@@ -5,6 +5,7 @@ import BrandLogo from "../components/BrandLogo.jsx";
 import {
   DOWNLOAD_URL,
   MICROSOFT_STORE_URL,
+  SHOW_ACCOUNT_BUTTON,
   SHOW_DOWNLOAD_SECTION,
   SHOW_FINAL_CTA,
   SHOW_HERO_DOWNLOAD,
@@ -336,7 +337,7 @@ export default function Landing({ user }) {
           {SHOW_DOWNLOAD_SECTION && <a href="#download">Download</a>}
         </nav>
         <div className="landing-nav-actions">
-          {user ? (
+          {SHOW_ACCOUNT_BUTTON && (user ? (
             <SurfaceFrame variant="ghost" size="sm">
               <a className="landing-btn landing-btn-ghost" href="/account">Account</a>
             </SurfaceFrame>
@@ -344,7 +345,7 @@ export default function Landing({ user }) {
             <SurfaceFrame variant="ghost" size="sm">
               <a className="landing-btn landing-btn-ghost" href="/login">Log in</a>
             </SurfaceFrame>
-          )}
+          ))}
           <SurfaceFrame variant="primary" size="sm">
             <a className="landing-btn landing-btn-primary" href={getHref}>Get PyClips</a>
           </SurfaceFrame>
@@ -366,11 +367,11 @@ export default function Landing({ user }) {
           <a href="#features" onClick={closeMenu}>Features</a>
           {SHOW_PRICING_PANEL && <a href="#pricing" onClick={closeMenu}>Pricing</a>}
           {SHOW_DOWNLOAD_SECTION && <a href="#download" onClick={closeMenu}>Download</a>}
-          {user ? (
+          {SHOW_ACCOUNT_BUTTON && (user ? (
             <a href="/account" onClick={closeMenu}>Account</a>
           ) : (
             <a href="/login" onClick={closeMenu}>Log in</a>
-          )}
+          ))}
           <SurfaceFrame variant="primary" full>
             <a className="landing-btn landing-btn-primary" href={getHref} onClick={closeMenu}>Get PyClips</a>
           </SurfaceFrame>
