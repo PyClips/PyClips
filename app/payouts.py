@@ -23,7 +23,7 @@ from . import db
 IST = timezone(timedelta(hours=5, minutes=30))
 CREATOR_PCT = 40
 PARTNERS_KEY = "payout_partner_names"
-DEFAULT_PARTNERS = ("Sameer", "Partner")
+DEFAULT_PARTNERS = ("You", "Partner")
 # systeme.io may reuse one order id for each monthly charge; a repeat this long after the
 # first is a renewal, a repeat sooner is a webhook retry.
 RENEWAL_GAP = timedelta(days=20)

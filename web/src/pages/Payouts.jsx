@@ -334,7 +334,7 @@ export default function Payouts() {
             ) : (
               <table className="admin-table">
                 <thead>
-                  <tr><th>Month</th><th>Sales</th><th>Total sales</th><th>Creators 40%</th><th>Left for you two</th><th>{first} half</th><th>{second} half</th><th></th></tr>
+                  <tr><th>Month</th><th>Sales</th><th>Total sales</th><th>Creators 40%</th><th>Left for you two</th><th>{first} (50%)</th><th>{second} (50%)</th><th></th></tr>
                 </thead>
                 <tbody>
                   {[...partnerDue, ...partnerBuilding].map((g) => (
