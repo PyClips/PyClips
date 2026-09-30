@@ -14,6 +14,7 @@ import {
   SOCIALS,
   SYSTEME_LIFETIME_URL,
   SYSTEME_MONTHLY_URL,
+  checkoutUrl,
 } from "../siteConfig.js";
 
 function prefersReducedMotion() {
@@ -401,10 +402,10 @@ export default function Landing({ user }) {
                 Microsoft Store
               </ExternalCta>
             )}
-            <ExternalCta url={SYSTEME_MONTHLY_URL} className="landing-btn landing-btn-primary landing-btn-lg">
+            <ExternalCta url={checkoutUrl(SYSTEME_MONTHLY_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
               PyClips Monthly
             </ExternalCta>
-            <ExternalCta url={SYSTEME_LIFETIME_URL} className="landing-btn landing-btn-primary landing-btn-lg">
+            <ExternalCta url={checkoutUrl(SYSTEME_LIFETIME_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
               PyClips Lifetime
             </ExternalCta>
           </div>

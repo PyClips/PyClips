@@ -16,6 +16,8 @@ export default function CreatorJoin() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const shareLink = `${window.location.origin}/?sa=${encodeURIComponent(code)}`;
 
   useEffect(() => { document.title = "Creator payouts · PyClips"; }, []);
 
@@ -44,9 +46,20 @@ export default function CreatorJoin() {
         {!code ? (
           <p className="error">This link is missing your affiliate code. Open the link from your PyClips affiliate email.</p>
         ) : done ? (
-          <p className="note ok">
-            You're set, {name.trim() || "creator"}. You get 40% of every sale from your link, renewals included, paid weekly to the UPI you entered.
-          </p>
+          <>
+            <p className="note ok">
+              You're set, {name.trim() || "creator"}. You get 40% of every sale from your link, renewals included, paid weekly to the UPI you entered.
+            </p>
+            <label className="auth-label">Share this link so every sale is counted for you
+              <input className="auth-input" value={shareLink} readOnly onFocus={(e) => e.target.select()} />
+            </label>
+            <SurfaceFrame variant="primary" full>
+              <button type="button" className="btn btn-primary auth-submit"
+                onClick={() => navigator.clipboard.writeText(shareLink).then(() => setCopied(true))}>
+                {copied ? "Copied" : "Copy link"}
+              </button>
+            </SurfaceFrame>
+          </>
         ) : (
           <>
             <p className="landing-sub">You get 40% of every PyClips sale from your link, renewals included, paid weekly. Tell us where to send it.</p>
