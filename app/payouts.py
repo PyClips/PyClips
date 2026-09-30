@@ -470,6 +470,33 @@ def creator_join(body: JoinBody) -> dict:
     return {"ok": True, "name": name, "creator_id": creator_id}
 
 
+def delete_creator(creator_id: int) -> dict:
+    """Remove a creator (test entries, mistakes). Their unpaid sales go back to "Needs your attention"."""
+    conn = _conn()
+    if conn.execute("SELECT 1 FROM creators WHERE id = ?", (creator_id,)).fetchone() is None:
+        raise HTTPException(status_code=404, detail="Creator not found.")
+    if conn.execute("SELECT 1 FROM payouts WHERE creator_id = ?", (creator_id,)).fetchone():
+        raise HTTPException(status_code=400, detail="This creator has payouts on record; mark them stopped instead of deleting.")
+    moved = conn.execute(
+        "UPDATE sales SET creator_id = NULL, matched_by = '', reviewed = 0 WHERE creator_id = ?", (creator_id,)
+    ).rowcount
+    conn.execute("DELETE FROM creators WHERE id = ?", (creator_id,))
+    conn.commit()
+    return {"ok": True, "sales_unassigned": moved}
+
+
+def delete_sale(sale_id: int) -> dict:
+    conn = _conn()
+    row = conn.execute("SELECT * FROM sales WHERE id = ?", (sale_id,)).fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Sale not found.")
+    if row["creator_payout_id"] or row["partner_payout_id"]:
+        raise HTTPException(status_code=400, detail="This sale is already in a payout; mark it Refunded instead.")
+    conn.execute("DELETE FROM sales WHERE id = ?", (sale_id,))
+    conn.commit()
+    return {"ok": True}
+
+
 def mark_creator_checked(creator_id: int) -> dict:
     conn = _conn()
     cur = conn.execute("UPDATE creators SET needs_check = 0 WHERE id = ?", (creator_id,))

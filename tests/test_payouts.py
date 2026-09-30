@@ -191,6 +191,28 @@ class PayoutTests(unittest.TestCase):
         self.assertIn("d3", payouts.sales_csv("2026-01-01", "2026-12-31"))
         self.assertIn("d3", payouts.sales_csv())
 
+    def test_delete_test_sales_and_creators(self):
+        self.record(sale("t1", 99, sa="sa001", email="a@x.com"))
+        self.record(sale("t2", 99, sa="sa002", email="b@x.com"))
+        ids = {s["order_id"]: s["id"] for s in payouts.list_sales()}
+        payouts.delete_sale(ids["t1"])
+        self.assertEqual([s["order_id"] for s in payouts.list_sales()], ["t2"])
+        result = payouts.delete_creator(self.sourabh)
+        self.assertEqual(result["sales_unassigned"], 1)
+        self.assertEqual(len(payouts.summary()["attention"]), 1)
+        payouts.delete_sale(ids["t2"])
+        payouts.delete_creator(self.lakshya)
+        self.assertEqual(payouts.list_creators(), [])
+        self.assertEqual(payouts.list_sales(), [])
+
+    def test_paid_sale_and_paid_creator_cannot_be_deleted(self):
+        self.record(sale("p1", 99, sa="sa001", email="a@x.com", when="2026-08-10T10:00:00+00:00"))
+        payouts.pay_creator(payouts.CreatorPayBody(creator_id=self.lakshya, week_start="2026-08-10"))
+        with self.assertRaises(Exception):
+            payouts.delete_sale(payouts.list_sales()[0]["id"])
+        with self.assertRaises(Exception):
+            payouts.delete_creator(self.lakshya)
+
     def test_manual_sale_and_paid_sale_is_locked(self):
         payouts.add_manual_sale(payouts.SaleBody(buyer_email="cash@x.com", plan="monthly", amount_rupees=99,
                                                  creator_id=self.sourabh, sold_on="2026-09-02", order_id="m1"))

@@ -319,6 +319,18 @@ def payouts_update_creator(creator_id: int, request: Request, body: payouts.Crea
     return payouts.save_creator(body, creator_id)
 
 
+@app.delete("/api/payouts/creators/{creator_id}")
+def payouts_delete_creator(creator_id: int, request: Request) -> dict:
+    admin.require_admin(request)
+    return payouts.delete_creator(creator_id)
+
+
+@app.delete("/api/payouts/sales/{sale_id}")
+def payouts_delete_sale(sale_id: int, request: Request) -> dict:
+    admin.require_admin(request)
+    return payouts.delete_sale(sale_id)
+
+
 @app.post("/api/payouts/creators/{creator_id}/checked")
 def payouts_creator_checked(creator_id: int, request: Request) -> dict:
     admin.require_admin(request)

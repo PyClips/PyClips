@@ -516,6 +516,13 @@ export default function Payouts() {
                         <button type="button" className="btn btn-ghost" disabled={busy} onClick={() => toggleRefund(s)}>
                           {s.refunded ? "Undo refund" : "Refunded"}
                         </button>
+                        {!s.creator_paid && !s.partners_paid && (
+                          <button type="button" className="btn btn-ghost" disabled={busy}
+                            onClick={() => window.confirm(`Delete this ${rupees(s.amount_paise)} sale from ${s.buyer_email || "unknown buyer"}? Only for test or duplicate entries.`)
+                              && run(() => api.payoutsDeleteSale(s.id), "Sale deleted.")}>
+                            Delete
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -605,6 +612,11 @@ export default function Payouts() {
                         <button type="button" className="btn btn-ghost" disabled={busy}
                           onClick={() => { setEditingCreator(c.id); setCreatorDraft({ ...EMPTY_CREATOR, ...c }); }}>
                           Edit
+                        </button>
+                        <button type="button" className="btn btn-ghost" disabled={busy}
+                          onClick={() => window.confirm(`Delete creator ${c.name}? Any of their unpaid sales go back to "Needs your attention".`)
+                            && run(() => api.payoutsDeleteCreator(c.id), `${c.name} deleted.`)}>
+                          Delete
                         </button>
                       </td>
                     </tr>
