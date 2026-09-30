@@ -223,7 +223,7 @@ export default function Payouts() {
         <>
           <h1 className="landing-title">To pay</h1>
           <p className="landing-sub">
-            Creators get {data.creator_pct}% of each sale, weekly (Monday–Sunday). {first} and {second} get 30% each, monthly.
+            Creators get {data.creator_pct}% of each sale, weekly (Monday–Sunday). At the end of each month, whatever is left after the creators is split 50/50 between {first} and {second}.
           </p>
           <div className="admin-stats">
             <div className="admin-stat">
@@ -334,7 +334,7 @@ export default function Payouts() {
             ) : (
               <table className="admin-table">
                 <thead>
-                  <tr><th>Month</th><th>Sales</th><th>Total sales</th><th>Creators 40%</th><th>{first} 30%</th><th>{second} 30%</th><th></th></tr>
+                  <tr><th>Month</th><th>Sales</th><th>Total sales</th><th>Creators 40%</th><th>Left for you two</th><th>{first} half</th><th>{second} half</th><th></th></tr>
                 </thead>
                 <tbody>
                   {[...partnerDue, ...partnerBuilding].map((g) => (
@@ -343,6 +343,7 @@ export default function Payouts() {
                       <td>{g.sales}</td>
                       <td>{rupees(g.gross_paise)}</td>
                       <td>{rupees(g.creator_paise)}</td>
+                      <td>{rupees(g.first_paise + g.second_paise)}</td>
                       <td>{rupees(g.first_paise)}</td>
                       <td>{rupees(g.second_paise)}</td>
                       <td className="admin-table-actions">

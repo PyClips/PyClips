@@ -579,16 +579,18 @@ def _partner_due(conn) -> list[dict]:
         if not (earn or takeback):
             continue
         month = month_of(_parse(row["sold_at"]))
-        g = groups.setdefault(month, {"month": month, "sales": 0, "gross_paise": 0, "creator_paise": 0, "first_paise": 0, "second_paise": 0})
+        g = groups.setdefault(month, {"month": month, "sales": 0, "gross_paise": 0, "creator_paise": 0, "rest_paise": 0})
         sign = 1 if earn else -1
         if earn:
             g["sales"] += 1
             g["gross_paise"] += int(row["amount_paise"])
             g["creator_paise"] += _creator
-        g["first_paise"] += sign * first
-        g["second_paise"] += sign * second
+        g["rest_paise"] += sign * (first + second)
     current = datetime.now(IST).strftime("%Y-%m")
     for g in groups.values():
+        rest = g.pop("rest_paise")
+        g["first_paise"] = rest - rest // 2
+        g["second_paise"] = rest // 2
         g["status"] = "due" if g["month"] < current else "this month"
     return sorted(groups.values(), key=lambda g: g["month"])
 

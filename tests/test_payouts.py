@@ -134,6 +134,21 @@ class PayoutTests(unittest.TestCase):
         self.assertEqual(history[0]["first_paise"], 20940)
         self.assertIn("Rahul", payouts.payouts_csv())
 
+    def test_month_remainder_after_all_creators_is_split_50_50(self):
+        extra = payouts.save_creator(payouts.CreatorBody(name="Forclipping", affiliate_code="sa003"))["id"]
+        self.assertTrue(extra)
+        codes = ["sa001", "sa002", "sa003"]
+        for i in range(9):
+            self.record(sale(f"m{i}", 99, sa=codes[i % 3], email=f"m{i}@x.com", when="2026-08-12T10:00:00+00:00"))
+        self.record(sale("m9", 599, sa="sa002", email="big@x.com", when="2026-08-30T10:00:00+00:00"), monthly=False)
+        month = next(g for g in payouts.summary()["partner_due"] if g["month"] == "2026-08")
+        gross = 9 * 9900 + 59900
+        self.assertEqual(month["gross_paise"], gross)
+        left = gross - month["creator_paise"]
+        self.assertEqual(month["creator_paise"], 9 * 3960 + 23960)
+        self.assertEqual(month["first_paise"] + month["second_paise"], left)
+        self.assertLessEqual(abs(month["first_paise"] - month["second_paise"]), 1)
+
     def test_manual_sale_and_paid_sale_is_locked(self):
         payouts.add_manual_sale(payouts.SaleBody(buyer_email="cash@x.com", plan="monthly", amount_rupees=99,
                                                  creator_id=self.sourabh, sold_on="2026-09-02", order_id="m1"))
