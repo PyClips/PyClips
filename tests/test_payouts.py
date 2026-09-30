@@ -149,6 +149,35 @@ class PayoutTests(unittest.TestCase):
         self.assertEqual(month["first_paise"] + month["second_paise"], left)
         self.assertLessEqual(abs(month["first_paise"] - month["second_paise"]), 1)
 
+    def test_creator_joins_from_link_and_picks_up_earlier_sales(self):
+        self.record(sale("j1", 99, sa="sa0077", email="fan@x.com"))
+        self.assertEqual(len(payouts.summary()["attention"]), 1)
+        payouts.creator_join(payouts.JoinBody(affiliate_code="sa0077", name="Asha", email="Asha@X.com", pay_to="asha@upi"))
+        summary = payouts.summary()
+        self.assertEqual(summary["attention"], [])
+        self.assertEqual([c["name"] for c in summary["new_creators"]], ["Asha"])
+        self.assertEqual(payouts.list_sales()[0]["creator_name"], "Asha")
+        with self.assertRaises(Exception):
+            payouts.creator_join(payouts.JoinBody(affiliate_code="sa0077", name="Thief", pay_to="thief@upi"))
+        asha = next(c for c in payouts.list_creators() if c["name"] == "Asha")
+        self.assertEqual(asha["pay_to"], "asha@upi")
+        payouts.mark_creator_checked(asha["id"])
+        self.assertEqual(payouts.summary()["new_creators"], [])
+
+    def test_join_fills_a_creator_added_by_email_only(self):
+        added = payouts.save_creator(payouts.CreatorBody(name="Lead", email="lead@x.com"))
+        payouts.creator_join(payouts.JoinBody(affiliate_code="sa0088", name="Lead Real", email="lead@x.com", pay_to="lead@upi"))
+        row = next(c for c in payouts.list_creators() if c["id"] == added["id"])
+        self.assertEqual((row["affiliate_code"], row["pay_to"], row["name"]), ("sa0088", "lead@upi", "Lead"))
+
+    def test_join_api_is_public(self):
+        from fastapi.testclient import TestClient
+        from app.main import app
+
+        res = TestClient(app).post("/api/creators/join", json={"affiliate_code": "sa0099", "name": "Pub", "pay_to": "pub@upi"})
+        self.assertEqual(res.status_code, 200, res.text)
+        self.assertTrue(any(c["affiliate_code"] == "sa0099" for c in payouts.list_creators()))
+
     def test_manual_sale_and_paid_sale_is_locked(self):
         payouts.add_manual_sale(payouts.SaleBody(buyer_email="cash@x.com", plan="monthly", amount_rupees=99,
                                                  creator_id=self.sourabh, sold_on="2026-09-02", order_id="m1"))

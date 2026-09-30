@@ -81,6 +81,8 @@ export const api = {
   payoutsUpdateSale: (id, body) => jpatch(`/api/payouts/sales/${id}`, body),
   payoutsAddCreator: (body) => jpost("/api/payouts/creators", body),
   payoutsUpdateCreator: (id, body) => jpatch(`/api/payouts/creators/${id}`, body),
+  payoutsCreatorChecked: (id) => jpost(`/api/payouts/creators/${id}/checked`, {}),
+  creatorJoin: (body) => jpost("/api/creators/join", body),
   payoutsPayCreator: (creator_id, week_start, reference) =>
     jpost("/api/payouts/pay-creator", { creator_id, week_start, reference: reference || "" }),
   payoutsPayPartners: (month, reference) => jpost("/api/payouts/pay-partners", { month, reference: reference || "" }),

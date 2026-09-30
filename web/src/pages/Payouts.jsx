@@ -196,6 +196,9 @@ export default function Payouts() {
   const [first, second] = data.partners;
   const creators = data.creators || [];
   const activeCreators = creators.filter((c) => c.active);
+  const newCreators = data.new_creators || [];
+  const alerts = data.attention.length + newCreators.length;
+  const joinLink = `${window.location.origin}/creator-join?sa={affiliate_id}&email={email}&name={first_name}`;
   const creatorDue = data.creator_due.filter((g) => g.status === "due");
   const creatorBuilding = data.creator_due.filter((g) => g.status !== "due");
   const partnerDue = data.partner_due.filter((g) => g.status === "due");
@@ -213,7 +216,7 @@ export default function Payouts() {
         </SurfaceFrame>
       </header>
       <nav className="admin-nav" aria-label="Payouts">
-        <Tab id="pay" tab={tab} setTab={setTab}>To pay{data.attention.length ? ` (${data.attention.length} ⚠)` : ""}</Tab>
+        <Tab id="pay" tab={tab} setTab={setTab}>To pay{alerts ? ` (${alerts} ⚠)` : ""}</Tab>
         <Tab id="sales" tab={tab} setTab={setTab}>Sales</Tab>
         <Tab id="creators" tab={tab} setTab={setTab}>Creators</Tab>
         <Tab id="history" tab={tab} setTab={setTab}>History</Tab>
@@ -248,6 +251,38 @@ export default function Payouts() {
             </div>
           </div>
           {message}
+
+          {newCreators.length > 0 && (
+            <div className="card admin-table-wrap">
+              <h2 style={{ margin: 0 }}>New creators joined ({newCreators.length})</h2>
+              <p className="note">They signed up from the link in their systeme.io email. Check the name and UPI look right before you pay them.</p>
+              <table className="admin-table">
+                <thead>
+                  <tr><th>Name</th><th>Email</th><th>Affiliate code</th><th>Pay to</th><th></th></tr>
+                </thead>
+                <tbody>
+                  {newCreators.map((c) => (
+                    <tr key={c.id}>
+                      <td>{c.name}</td>
+                      <td>{c.email || "—"}</td>
+                      <td>{c.affiliate_code}</td>
+                      <td>{c.pay_to}</td>
+                      <td className="admin-table-actions">
+                        <button type="button" className="btn btn-ghost" disabled={busy}
+                          onClick={() => run(() => api.payoutsCreatorChecked(c.id), `${c.name} confirmed.`)}>
+                          Looks good
+                        </button>
+                        <button type="button" className="btn btn-ghost" disabled={busy}
+                          onClick={() => { setTab("creators"); setEditingCreator(c.id); setCreatorDraft({ ...EMPTY_CREATOR, ...c }); }}>
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {data.attention.length > 0 && (
             <div className="card">
@@ -304,7 +339,7 @@ export default function Payouts() {
                       <tr key={`${g.creator_id}-${g.week_start}`}>
                         <td>{niceDay(g.week_start)} – {niceDay(g.week_end)}<br /><span className={g.status === "due" ? "tag-bad" : "note"}>{g.status === "due" ? "Due now" : "Week still running"}</span></td>
                         <td>{g.creator_name}</td>
-                        <td>{creator?.pay_to || <span className="tag-bad">No UPI saved</span>}</td>
+                        <td>{creator?.pay_to || <span className="tag-bad">No UPI saved</span>}{creator?.needs_check && <><br /><span className="tag-bad">new, check UPI</span></>}</td>
                         <td>{g.sales}</td>
                         <td>
                           {rupees(g.amount_paise)}
@@ -453,9 +488,24 @@ export default function Payouts() {
         <>
           <h1 className="landing-title">Creators</h1>
           <p className="landing-sub">
-            The affiliate code is the part after <code>sa=</code> in the creator's systeme.io affiliate link. Sales carrying it are matched automatically.
+            The affiliate code is the part after <code>sa=</code> in the creator's             systeme.io affiliate link. Sales carrying it are matched automatically.
           </p>
           {message}
+          <div className="card">
+            <h2>Add creators automatically</h2>
+            <p className="note">
+              Put this link in the email systeme.io sends after someone signs up on your Affiliate Signup funnel.
+              systeme.io fills in each creator's own code, email and name; they only type their UPI and appear here.
+              If systeme.io's variable picker shows different names, use its affiliate ID, email and first name variables.
+            </p>
+            <input className="auth-input" value={joinLink} readOnly onFocus={(e) => e.target.select()} />
+            <SurfaceFrame variant="ghost" size="sm">
+              <button type="button" className="btn btn-ghost"
+                onClick={() => navigator.clipboard.writeText(joinLink).then(() => setMsg({ text: "Link copied.", ok: true }))}>
+                Copy link
+              </button>
+            </SurfaceFrame>
+          </div>
           <div className="card admin-table-wrap">
             {!creators.length ? (
               <p className="note">No creators yet. Add them below.</p>
@@ -471,7 +521,7 @@ export default function Payouts() {
                       <td>{c.email}</td>
                       <td>{c.affiliate_code || <span className="tag-bad">missing</span>}</td>
                       <td>{c.pay_to || <span className="tag-bad">missing</span>}</td>
-                      <td>{c.active ? "active" : "stopped"}</td>
+                      <td>{c.active ? "active" : "stopped"}{c.needs_check && <><br /><span className="tag-bad">new, check</span></>}</td>
                       <td className="admin-table-actions">
                         <button type="button" className="btn btn-ghost" disabled={busy}
                           onClick={() => { setEditingCreator(c.id); setCreatorDraft({ ...EMPTY_CREATOR, ...c }); }}>

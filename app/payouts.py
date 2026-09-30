@@ -39,6 +39,13 @@ class CreatorBody(BaseModel):
     active: bool = True
 
 
+class JoinBody(BaseModel):
+    affiliate_code: str = Field(min_length=2, max_length=80)
+    name: str = Field(min_length=1, max_length=80)
+    email: str = Field(default="", max_length=254)
+    pay_to: str = Field(min_length=3, max_length=200)
+
+
 class SaleBody(BaseModel):
     buyer_email: str = Field(default="", max_length=254)
     plan: str = Field(default="monthly", max_length=16)
@@ -128,6 +135,9 @@ def ensure_tables(conn=None) -> None:
         );
         """
     )
+    cols = {r["name"] for r in conn.execute("PRAGMA table_info(creators)").fetchall()}
+    if "needs_check" not in cols:
+        conn.execute("ALTER TABLE creators ADD COLUMN needs_check INTEGER NOT NULL DEFAULT 0")
     conn.commit()
 
 
@@ -357,6 +367,7 @@ def _creator_dict(row) -> dict:
         "pay_to": row["pay_to"],
         "note": row["note"],
         "active": bool(row["active"]),
+        "needs_check": bool(row["needs_check"]),
     }
 
 
@@ -384,7 +395,7 @@ def save_creator(body: CreatorBody, creator_id: Optional[int] = None) -> dict:
     values = (body.name.strip(), body.email.strip().lower(), code, body.pay_to.strip(), body.note.strip(), int(body.active))
     if creator_id:
         cur = conn.execute(
-            "UPDATE creators SET name = ?, email = ?, affiliate_code = ?, pay_to = ?, note = ?, active = ? WHERE id = ?",
+            "UPDATE creators SET name = ?, email = ?, affiliate_code = ?, pay_to = ?, note = ?, active = ?, needs_check = 0 WHERE id = ?",
             values + (creator_id,),
         )
         if cur.rowcount == 0:
@@ -418,6 +429,54 @@ def _rematch_unassigned(conn) -> int:
             fixed += 1
     conn.commit()
     return fixed
+
+
+def creator_join(body: JoinBody) -> dict:
+    """A creator registers from the link in their systeme.io affiliate email (sa= filled in by systeme.io).
+
+    Public, so it never overwrites an existing payout destination; the owner confirms each join.
+    """
+    conn = _conn()
+    code = _clean_code(body.affiliate_code)
+    if not code:
+        raise HTTPException(status_code=400, detail="This link is missing your affiliate code. Use the link from your systeme.io email.")
+    name, email, pay_to = body.name.strip(), body.email.strip().lower(), body.pay_to.strip()
+    row = conn.execute("SELECT * FROM creators WHERE lower(affiliate_code) = lower(?)", (code,)).fetchone()
+    if row is None and email:
+        row = conn.execute(
+            "SELECT * FROM creators WHERE affiliate_code = '' AND email != '' AND lower(email) = ?", (email,)
+        ).fetchone()
+    if row is not None and row["pay_to"]:
+        raise HTTPException(
+            status_code=409,
+            detail="You're already registered. To change your payout details, email pyclips.in@gmail.com.",
+        )
+    if row is not None:
+        conn.execute(
+            "UPDATE creators SET name = CASE WHEN name = '' THEN ? ELSE name END, "
+            "email = CASE WHEN email = '' THEN ? ELSE email END, affiliate_code = ?, pay_to = ?, needs_check = 1 WHERE id = ?",
+            (name, email, code, pay_to, row["id"]),
+        )
+        creator_id = int(row["id"])
+    else:
+        cur = conn.execute(
+            "INSERT INTO creators (name, email, affiliate_code, pay_to, note, active, created_at, needs_check) "
+            "VALUES (?, ?, ?, ?, 'Joined from the systeme.io link', 1, ?, 1)",
+            (name, email, code, pay_to, _stamp()),
+        )
+        creator_id = int(cur.lastrowid)
+    conn.commit()
+    _rematch_unassigned(conn)
+    return {"ok": True, "name": name, "creator_id": creator_id}
+
+
+def mark_creator_checked(creator_id: int) -> dict:
+    conn = _conn()
+    cur = conn.execute("UPDATE creators SET needs_check = 0 WHERE id = ?", (creator_id,))
+    conn.commit()
+    if cur.rowcount == 0:
+        raise HTTPException(status_code=404, detail="Creator not found.")
+    return {"ok": True}
 
 
 # --------------------------------------------------------------------------- sales
@@ -624,6 +683,7 @@ def summary() -> dict:
         "creator_due": creator_due,
         "partner_due": partner_due,
         "attention": attention,
+        "new_creators": [_creator_dict(r) for r in conn.execute("SELECT * FROM creators WHERE needs_check = 1 ORDER BY created_at")],
     }
 
 

@@ -319,6 +319,28 @@ def payouts_update_creator(creator_id: int, request: Request, body: payouts.Crea
     return payouts.save_creator(body, creator_id)
 
 
+@app.post("/api/payouts/creators/{creator_id}/checked")
+def payouts_creator_checked(creator_id: int, request: Request) -> dict:
+    admin.require_admin(request)
+    return payouts.mark_creator_checked(creator_id)
+
+
+_JOIN_HITS: dict[str, list[float]] = {}
+
+
+@app.post("/api/creators/join")
+def creator_join(request: Request, body: payouts.JoinBody) -> dict:
+    import time
+
+    ip = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip() or (request.client.host if request.client else "?")
+    now = time.time()
+    hits = [t for t in _JOIN_HITS.get(ip, []) if now - t < 3600]
+    if len(hits) >= 10:
+        raise HTTPException(status_code=429, detail="Too many tries. Please wait an hour and try again.")
+    _JOIN_HITS[ip] = hits + [now]
+    return payouts.creator_join(body)
+
+
 @app.post("/api/payouts/pay-creator")
 def payouts_pay_creator(request: Request, body: payouts.CreatorPayBody) -> dict:
     admin.require_admin(request)
