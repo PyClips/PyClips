@@ -86,6 +86,7 @@ button { font-family: inherit; }
 .error { background: var(--danger-soft); border: 1px solid rgba(240, 87, 109, 0.3); color: #ffb3bd; font-size: 13.5px; padding: 12px 14px; border-radius: var(--radius-sm); }
 .note { font-size: 13px; color: var(--muted); line-height: 1.5; }
 .note.ok { color: var(--ok); }
+.tag-bad { display: inline-block; margin-top: 4px; background: var(--danger-soft); border: 1px solid rgba(240, 87, 109, 0.3); color: #ffb3bd; font-size: 12px; padding: 2px 8px; border-radius: 999px; }
 
 .page { max-width: 640px; margin: 0 auto; padding: 24px 20px 48px; }
 .page.admin-wide { max-width: 1080px; }

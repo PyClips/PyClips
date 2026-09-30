@@ -75,6 +75,17 @@ export const api = {
   adminDeleteUser: (id) => jdel(`/api/admin/users/${id}`),
   adminSetDownloadHits: (hits) => jpost("/api/admin/download-hits", { hits: Number(hits) || 0 }),
   publicDownload: () => jget("/api/download"),
+  payoutsSummary: () => jget("/api/payouts/summary"),
+  payoutsSales: (month = "") => jget(`/api/payouts/sales?month=${encodeURIComponent(month || "")}`),
+  payoutsAddSale: (body) => jpost("/api/payouts/sales", body),
+  payoutsUpdateSale: (id, body) => jpatch(`/api/payouts/sales/${id}`, body),
+  payoutsAddCreator: (body) => jpost("/api/payouts/creators", body),
+  payoutsUpdateCreator: (id, body) => jpatch(`/api/payouts/creators/${id}`, body),
+  payoutsPayCreator: (creator_id, week_start, reference) =>
+    jpost("/api/payouts/pay-creator", { creator_id, week_start, reference: reference || "" }),
+  payoutsPayPartners: (month, reference) => jpost("/api/payouts/pay-partners", { month, reference: reference || "" }),
+  payoutsSetPartners: (first, second) => jpost("/api/payouts/partners", { first, second }),
+  payoutsHistory: () => jget("/api/payouts/history"),
 };
 
 export function loadRazorpay() {

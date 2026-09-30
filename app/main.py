@@ -7,12 +7,14 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import logging
 from typing import Optional
 
-from . import admin, auth, billing, oauth, tickets
+from . import admin, auth, billing, oauth, payouts, tickets
 from .config import WEB_DIST, load_dotenv, payments_ready, settings, storage_status
 
 load_dotenv()
+logger = logging.getLogger("pyclips.site")
 
 app = FastAPI(title="PyClips accounts", docs_url=None, redoc_url=None)
 
@@ -237,7 +239,7 @@ class AffiliateClaim(BaseModel):
 
 @app.post("/api/billing/systeme")
 async def systeme_sale(request: Request) -> dict:
-    """Creator-link sale from systeme.io. ₹99 → one month Premium. ₹599 lifetime is ignored here."""
+    """Creator-link sale from systeme.io. Every sale is logged for creator payouts; ₹99 also grants one month Premium."""
     import hmac
     import json as _json
 
@@ -260,7 +262,17 @@ async def systeme_sale(request: Request) -> dict:
         payload = {}
     email = billing._pick_email(payload)
     order_id = billing._pick_order(payload)
-    if not billing.is_affiliate_monthly(payload):
+    event = (request.headers.get("X-Webhook-Event") or "").strip().upper()
+    if event == "SALE_CANCELED":
+        return {"ok": True, "canceled": payouts.mark_systeme_canceled(order_id)}
+    if event and event != "SALE_NEW":
+        return {"ok": True, "skipped": True, "reason": f"event {event}"}
+    monthly = billing.is_affiliate_monthly(payload)
+    try:
+        payouts.record_systeme_sale(payload, email=email, order_id=order_id, monthly=monthly)
+    except Exception:  # noqa: BLE001  (the buyer's Premium must not wait on the ledger)
+        logger.exception("Could not record systeme.io sale %s in the payouts ledger", order_id)
+    if not monthly:
         return {
             "ok": True,
             "skipped": True,
@@ -269,6 +281,82 @@ async def systeme_sale(request: Request) -> dict:
             "order_id": order_id or None,
         }
     return billing.grant_affiliate_month(email, order_id)
+
+
+@app.get("/api/payouts/summary")
+def payouts_summary(request: Request) -> dict:
+    admin.require_admin(request)
+    return {**payouts.summary(), "creators": payouts.list_creators()}
+
+
+@app.get("/api/payouts/sales")
+def payouts_sales(request: Request, month: str = "") -> dict:
+    admin.require_admin(request)
+    return {"sales": payouts.list_sales(month)}
+
+
+@app.post("/api/payouts/sales")
+def payouts_add_sale(request: Request, body: payouts.SaleBody) -> dict:
+    admin.require_admin(request)
+    return payouts.add_manual_sale(body)
+
+
+@app.patch("/api/payouts/sales/{sale_id}")
+def payouts_update_sale(sale_id: int, request: Request, body: payouts.SaleUpdateBody) -> dict:
+    admin.require_admin(request)
+    return payouts.update_sale(sale_id, body)
+
+
+@app.post("/api/payouts/creators")
+def payouts_add_creator(request: Request, body: payouts.CreatorBody) -> dict:
+    admin.require_admin(request)
+    return payouts.save_creator(body)
+
+
+@app.patch("/api/payouts/creators/{creator_id}")
+def payouts_update_creator(creator_id: int, request: Request, body: payouts.CreatorBody) -> dict:
+    admin.require_admin(request)
+    return payouts.save_creator(body, creator_id)
+
+
+@app.post("/api/payouts/pay-creator")
+def payouts_pay_creator(request: Request, body: payouts.CreatorPayBody) -> dict:
+    admin.require_admin(request)
+    return payouts.pay_creator(body)
+
+
+@app.post("/api/payouts/pay-partners")
+def payouts_pay_partners(request: Request, body: payouts.PartnerPayBody) -> dict:
+    admin.require_admin(request)
+    return payouts.pay_partners(body)
+
+
+@app.post("/api/payouts/partners")
+def payouts_partner_names(request: Request, body: payouts.PartnersBody) -> dict:
+    admin.require_admin(request)
+    return payouts.set_partner_names(body)
+
+
+@app.get("/api/payouts/history")
+def payouts_history(request: Request) -> dict:
+    admin.require_admin(request)
+    return {"payouts": payouts.list_payouts()}
+
+
+@app.get("/api/payouts/export/{name}.csv")
+def payouts_export(name: str, request: Request) -> Response:
+    admin.require_admin(request)
+    if name == "sales":
+        body = payouts.sales_csv()
+    elif name == "payouts":
+        body = payouts.payouts_csv()
+    else:
+        raise HTTPException(status_code=404, detail="Not found.")
+    return Response(
+        content="\ufeff" + body,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="pyclips-{name}.csv"'},
+    )
 
 
 @app.post("/api/billing/systeme/claim")

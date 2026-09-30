@@ -5,6 +5,7 @@ import AuthPanel from "./components/AuthPanel.jsx";
 import BrandLogo from "./components/BrandLogo.jsx";
 import Landing from "./pages/Landing.jsx";
 import Admin from "./pages/Admin.jsx";
+import Payouts from "./pages/Payouts.jsx";
 
 function pathOf() {
   return window.location.pathname.replace(/\/$/, "") || "/";
@@ -524,7 +525,7 @@ export default function App() {
   const defaultPlan = qs("plan") === "yearly" ? "yearly" : "monthly";
   const page = pathOf();
   const isPrivacy = page === "/privacy";
-  const isAdmin = page === "/admin";
+  const isAdmin = page === "/admin" || page === "/payouts";
   const isLanding = (page === "/" || page === "/landing") && !ticket;
   const needsAuthGate = !isLanding && !isPrivacy && !isAdmin;
 
@@ -556,6 +557,9 @@ export default function App() {
 
   if (isPrivacy) {
     return <Privacy />;
+  }
+  if (page === "/payouts") {
+    return <Payouts />;
   }
   if (isAdmin) {
     return <Admin />;
