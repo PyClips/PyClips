@@ -764,27 +764,54 @@ def _rupees(paise: int) -> str:
     return f"{paise / 100:.2f}"
 
 
-def sales_csv() -> str:
+def _in_range(day: str, start: str, end: str) -> bool:
+    """Inclusive YYYY-MM-DD bounds (India dates); an empty bound is open."""
+    return (not start or day >= start) and (not end or day <= end)
+
+
+def _ist_day(stamp: str) -> str:
+    return _parse(stamp).astimezone(IST).date().isoformat()
+
+
+def sales_csv(start: str = "", end: str = "") -> str:
     first, second = partner_names()
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(["Date (IST)", "Order", "Source", "Buyer", "Plan", "Amount ₹", "Creator", "Creator 40% ₹",
-                f"{first} 30% ₹", f"{second} 30% ₹", "Refunded", "Creator paid", "Partners paid", "Note"])
+                f"{first} 50% of rest ₹", f"{second} 50% of rest ₹", "Refunded", "Creator paid", "Partners paid", "Note"])
+    totals = [0, 0, 0, 0]
+    count = 0
     for s in list_sales():
+        if not _in_range(s["sold_day"], start, end):
+            continue
         w.writerow([s["sold_day"], s["order_id"], s["source"], s["buyer_email"], s["plan"], _rupees(s["amount_paise"]),
                     s["creator_name"] or "(none)", _rupees(s["creator_paise"]), _rupees(s["first_paise"]),
                     _rupees(s["second_paise"]), "yes" if s["refunded"] else "", "yes" if s["creator_paid"] else "",
                     "yes" if s["partners_paid"] else "", s["note"]])
+        if s["creator_id"] is not None and not s["refunded"]:
+            count += 1
+            for i, key in enumerate(("amount_paise", "creator_paise", "first_paise", "second_paise")):
+                totals[i] += s[key]
+    w.writerow([])
+    w.writerow([f"Total ({count} creator sales, refunds excluded)", "", "", "", "", _rupees(totals[0]), "",
+                _rupees(totals[1]), _rupees(totals[2]), _rupees(totals[3])])
     return buf.getvalue()
 
 
-def payouts_csv() -> str:
+def payouts_csv(start: str = "", end: str = "") -> str:
     first, second = partner_names()
     buf = io.StringIO()
     w = csv.writer(buf)
-    w.writerow(["Paid at (UTC)", "Type", "Creator", "Period", "Amount ₹", f"{first} ₹", f"{second} ₹", "Sales", "Reference"])
+    w.writerow(["Paid on (IST)", "Type", "Creator", "Period", "Amount ₹", f"{first} ₹", f"{second} ₹", "Sales", "Reference"])
+    total = 0
     for p in list_payouts():
-        w.writerow([p["paid_at"], p["kind"], p["creator_name"] or "", p["period"], _rupees(p["amount_paise"]),
+        day = _ist_day(p["paid_at"])
+        if not _in_range(day, start, end):
+            continue
+        total += p["amount_paise"]
+        w.writerow([day, p["kind"], p["creator_name"] or "", p["period"], _rupees(p["amount_paise"]),
                     _rupees(p["first_paise"]) if p["kind"] == "partner" else "",
                     _rupees(p["second_paise"]) if p["kind"] == "partner" else "", p["sale_count"], p["reference"]])
+    w.writerow([])
+    w.writerow(["Total paid out", "", "", "", _rupees(total)])
     return buf.getvalue()

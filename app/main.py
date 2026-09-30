@@ -366,18 +366,24 @@ def payouts_history(request: Request) -> dict:
 
 
 @app.get("/api/payouts/export/{name}.csv")
-def payouts_export(name: str, request: Request) -> Response:
+def payouts_export(name: str, request: Request, start: str = "", end: str = "") -> Response:
+    import re
+
     admin.require_admin(request)
+    for value in (start, end):
+        if value and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            raise HTTPException(status_code=400, detail="Dates must be YYYY-MM-DD.")
     if name == "sales":
-        body = payouts.sales_csv()
+        body = payouts.sales_csv(start, end)
     elif name == "payouts":
-        body = payouts.payouts_csv()
+        body = payouts.payouts_csv(start, end)
     else:
         raise HTTPException(status_code=404, detail="Not found.")
+    span = f"-{start or 'start'}-to-{end or 'today'}" if start or end else ""
     return Response(
         content="\ufeff" + body,
         media_type="text/csv; charset=utf-8",
-        headers={"Content-Disposition": f'attachment; filename="pyclips-{name}.csv"'},
+        headers={"Content-Disposition": f'attachment; filename="pyclips-{name}{span}.csv"'},
     )
 
 

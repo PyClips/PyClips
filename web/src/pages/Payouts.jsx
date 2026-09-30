@@ -29,6 +29,85 @@ function Tab({ id, tab, setTab, children }) {
   );
 }
 
+function isoDay(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function monthRange(ym) {
+  const [y, m] = ym.split("-").map(Number);
+  return [isoDay(new Date(y, m - 1, 1)), isoDay(new Date(y, m, 0))];
+}
+
+function DownloadCard({ what }) {
+  const now = new Date();
+  const thisMonth = isoDay(now).slice(0, 7);
+  const lastMonth = isoDay(new Date(now.getFullYear(), now.getMonth() - 1, 1)).slice(0, 7);
+  const years = [];
+  for (let y = now.getFullYear(); y >= 2026; y -= 1) years.push(String(y));
+  const [mode, setMode] = useState("this_month");
+  const [month, setMonth] = useState(thisMonth);
+  const [year, setYear] = useState(String(now.getFullYear()));
+  const [from, setFrom] = useState(`${thisMonth}-01`);
+  const [to, setTo] = useState(isoDay(now));
+
+  let range = ["", ""];
+  if (mode === "this_month") range = monthRange(thisMonth);
+  else if (mode === "last_month") range = monthRange(lastMonth);
+  else if (mode === "month") range = monthRange(month || thisMonth);
+  else if (mode === "year") range = [`${year}-01-01`, `${year}-12-31`];
+  else if (mode === "custom") range = [from, to];
+  const [start, end] = range;
+  const query = new URLSearchParams();
+  if (start) query.set("start", start);
+  if (end) query.set("end", end);
+  const href = `/api/payouts/export/${what}.csv${query.toString() ? `?${query}` : ""}`;
+  const label = what === "sales" ? "sales" : "payouts";
+
+  return (
+    <div className="card">
+      <h2>Download {label} (Excel / CSV)</h2>
+      <div className="auth-form">
+        <label className="auth-label">Period
+          <select className="auth-input" value={mode} onChange={(e) => setMode(e.target.value)}>
+            <option value="this_month">This month</option>
+            <option value="last_month">Last month</option>
+            <option value="month">Pick a month</option>
+            <option value="year">Pick a year</option>
+            <option value="custom">Date range</option>
+            <option value="all">All time</option>
+          </select>
+        </label>
+        {mode === "month" && (
+          <label className="auth-label">Month
+            <input className="auth-input" type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
+          </label>
+        )}
+        {mode === "year" && (
+          <label className="auth-label">Year
+            <select className="auth-input" value={year} onChange={(e) => setYear(e.target.value)}>
+              {years.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </label>
+        )}
+        {mode === "custom" && (
+          <>
+            <label className="auth-label">From
+              <input className="auth-input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+            </label>
+            <label className="auth-label">To
+              <input className="auth-input" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+            </label>
+          </>
+        )}
+        <p className="note">{start || end ? `${niceDay(start)} ${start.slice(0, 4)} – ${niceDay(end)} ${end.slice(0, 4)}` : "Everything recorded so far"}</p>
+        <SurfaceFrame variant="primary" full>
+          <a className="btn btn-primary" href={href} download>Download</a>
+        </SurfaceFrame>
+      </div>
+    </div>
+  );
+}
+
 const EMPTY_CREATOR = { name: "", email: "", affiliate_code: "", pay_to: "", note: "", active: true };
 const EMPTY_SALE = { buyer_email: "", plan: "monthly", amount_rupees: "99", creator_id: "", sold_on: "", order_id: "", note: "" };
 
@@ -399,10 +478,10 @@ export default function Payouts() {
         <>
           <h1 className="landing-title">Sales</h1>
           <p className="landing-sub">
-            Every systeme.io sale lands here on its own, ₹99 monthly and ₹599 lifetime, renewals included.{" "}
-            <a href="/api/payouts/export/sales.csv">Download CSV</a>
+            Every systeme.io sale lands here on its own, ₹99 monthly and ₹599 lifetime, renewals included.
           </p>
           {message}
+          <DownloadCard what="sales" />
           <div className="card admin-table-wrap">
             {!sales.length ? (
               <p className="note">No sales recorded yet.</p>
@@ -584,7 +663,8 @@ export default function Payouts() {
       {tab === "history" && (
         <>
           <h1 className="landing-title">History</h1>
-          <p className="landing-sub">Every payout you marked paid. <a href="/api/payouts/export/payouts.csv">Download CSV</a></p>
+          <p className="landing-sub">Every payout you marked paid.</p>
+          <DownloadCard what="payouts" />
           <div className="card admin-table-wrap">
             {!history.length ? (
               <p className="note">No payouts yet.</p>

@@ -178,6 +178,19 @@ class PayoutTests(unittest.TestCase):
         self.assertEqual(res.status_code, 200, res.text)
         self.assertTrue(any(c["affiliate_code"] == "sa0099" for c in payouts.list_creators()))
 
+    def test_csv_date_range_uses_india_dates_and_totals(self):
+        self.record(sale("d1", 99, sa="sa001", email="a@x.com", when="2026-07-31T19:00:00+00:00"))  # 1 Aug IST
+        self.record(sale("d2", 599, sa="sa002", email="b@x.com", when="2026-08-20T10:00:00+00:00"), monthly=False)
+        self.record(sale("d3", 99, sa="sa001", email="c@x.com", when="2026-09-02T10:00:00+00:00"))
+        august = payouts.sales_csv("2026-08-01", "2026-08-31")
+        self.assertIn("d1", august)
+        self.assertIn("d2", august)
+        self.assertNotIn("d3", august)
+        self.assertIn("Total (2 creator sales, refunds excluded)", august)
+        self.assertIn("698.00", august)
+        self.assertIn("d3", payouts.sales_csv("2026-01-01", "2026-12-31"))
+        self.assertIn("d3", payouts.sales_csv())
+
     def test_manual_sale_and_paid_sale_is_locked(self):
         payouts.add_manual_sale(payouts.SaleBody(buyer_email="cash@x.com", plan="monthly", amount_rupees=99,
                                                  creator_id=self.sourabh, sold_on="2026-09-02", order_id="m1"))
