@@ -419,16 +419,10 @@ export default function Landing({ user }) {
               </ExternalCta>
             )}
             <ExternalCta url={checkoutUrl(SYSTEME_MONTHLY_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
-              <WindowsMark /><span>PyClips Monthly</span>
+              <span className="os-marks"><WindowsMark /><AppleMark /></span><span>PyClips Monthly</span>
             </ExternalCta>
             <ExternalCta url={checkoutUrl(SYSTEME_LIFETIME_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
-              <WindowsMark /><span>PyClips Lifetime</span>
-            </ExternalCta>
-            <ExternalCta url={checkoutUrl(SYSTEME_MONTHLY_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
-              <AppleMark /><span>Mac Monthly</span>
-            </ExternalCta>
-            <ExternalCta url={checkoutUrl(SYSTEME_LIFETIME_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
-              <AppleMark /><span>Mac Lifetime</span>
+              <span className="os-marks"><WindowsMark /><AppleMark /></span><span>PyClips Lifetime</span>
             </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">

@@ -189,6 +189,7 @@ a.brand-hero { color: inherit; text-decoration: none; cursor: pointer; }
 .landing-btn-store { background: var(--surface); }
 .landing-btn-store .ms-mark { flex-shrink: 0; display: block; }
 .landing-btn .os-mark { flex-shrink: 0; display: block; }
+.landing-btn .os-marks { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .landing-btn-lg { padding: 13px 20px; font-size: 15px; }
 .landing-btn-full { width: 100%; }
 .landing-btn.is-disabled,
