@@ -113,11 +113,11 @@ function Shot({ src, alt, eager = false }) {
 const FAQS = [
   {
     q: "What is PyClips?",
-    a: "PyClips is a Windows desktop app that turns videos into captioned short-form clips. Import, set up the clip, pick a soundtrack, style captions, then bake and export MP4s.",
+    a: "PyClips is a desktop app for Windows and Mac that turns videos into captioned short-form clips. Import, set up the clip, pick a soundtrack, style captions, then bake and export MP4s.",
   },
   {
     q: "How do I install PyClips?",
-    a: "Get PyClips from the Microsoft Store on Windows 10 or Windows 11. A direct Windows installer is also offered on this site when it is available.",
+    a: "Get PyClips from the Microsoft Store on Windows 10 or Windows 11. A direct Windows installer is also offered on this site when it is available. On Mac, PyClips runs on macOS 14 Sonoma or newer, on Apple Silicon and Intel Macs: open the .dmg, drag PyClips to Applications, and approve it once in System Settings ? Privacy & Security.",
   },
   {
     q: "Can I use my own videos?",
@@ -133,11 +133,11 @@ const FAQS = [
   },
   {
     q: "Does PyClips use my GPU?",
-    a: "When a compatible NVIDIA GPU is available, PyClips can use GPU acceleration for processing. CPU processing remains available otherwise.",
+    a: "On Windows, when a compatible NVIDIA GPU is available, PyClips can use GPU acceleration for processing. CPU processing remains available otherwise. On Mac, PyClips processes on the CPU.",
   },
   {
     q: "Where are my exported clips saved?",
-    a: "Finished clips are saved to your PyClips Downloads folder.",
+    a: "On Windows, finished clips are saved to your PyClips Downloads folder. On Mac, they go to Movies → PyClips.",
   },
   {
     q: "Is there a free version?",
@@ -397,7 +397,7 @@ export default function Landing({ user }) {
 
       <main>
         <section className="landing-hero" id="get">
-          <p className="landing-eyebrow">Windows desktop clip studio</p>
+          <p className="landing-eyebrow">Desktop clip studio for Windows &amp; Mac</p>
           <h1>
             Turn long videos into
             <br />
@@ -432,7 +432,7 @@ export default function Landing({ user }) {
             </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">
-            <li>Windows app</li>
+            <li>Windows &amp; Mac</li>
             <li>Styled captions</li>
             <li>GPU optional</li>
           </ul>
@@ -557,7 +557,7 @@ export default function Landing({ user }) {
 
         <section className="landing-block landing-flow-block reveal">
           <h2>One workflow. No editing headache.</h2>
-          <p className="landing-subhead">Import, clip setup, soundtrack, captions, style, review, and export from one Windows app.</p>
+          <p className="landing-subhead">Import, clip setup, soundtrack, captions, style, review, and export from one desktop app on Windows or Mac.</p>
           <ol className="landing-flow">
             <li>Import</li>
             <li>Clip</li>
@@ -657,7 +657,7 @@ export default function Landing({ user }) {
 
         <section className="landing-block landing-faq-block reveal" id="faq">
           <h2>Frequently asked questions</h2>
-          <p className="landing-subhead">How PyClips works on Windows, billing, and the free tier.</p>
+          <p className="landing-subhead">How PyClips works on Windows and Mac, billing, and the free tier.</p>
           <div className="landing-faq">
             {FAQS.map((item) => (
               <details key={item.q} className="landing-faq-item">
@@ -689,7 +689,7 @@ export default function Landing({ user }) {
           <span className="landing-mark sm"><Bolt size={16} /></span>
           <div>
             <strong>PyClips</strong>
-            <p>AI-powered video clipping for Windows.</p>
+            <p>AI-powered video clipping for Windows and Mac.</p>
           </div>
         </div>
         <nav aria-label="Footer">
