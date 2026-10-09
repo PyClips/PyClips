@@ -4,6 +4,7 @@ import SurfaceFrame from "./components/SurfaceFrame.jsx";
 import AuthPanel from "./components/AuthPanel.jsx";
 import BrandLogo from "./components/BrandLogo.jsx";
 import Landing from "./pages/Landing.jsx";
+import MainLanding from "./pages/MainLanding.jsx";
 import Admin from "./pages/Admin.jsx";
 import Payouts from "./pages/Payouts.jsx";
 import CreatorJoin from "./pages/CreatorJoin.jsx";
@@ -527,7 +528,8 @@ export default function App() {
   const page = pathOf();
   const isPrivacy = page === "/privacy";
   const isAdmin = page === "/admin" || page === "/payouts" || page === "/creator-join";
-  const isLanding = (page === "/" || page === "/landing") && !ticket;
+  const isMainLanding = page.toLowerCase() === "/pyclips" && !ticket;
+  const isLanding = ((page === "/" || page === "/landing") && !ticket) || isMainLanding;
   const needsAuthGate = !isLanding && !isPrivacy && !isAdmin;
 
   const [ready, setReady] = useState(!needsAuthGate);
@@ -567,6 +569,9 @@ export default function App() {
   }
   if (isAdmin) {
     return <Admin />;
+  }
+  if (isMainLanding) {
+    return <MainLanding user={user} />;
   }
   if (isLanding) {
     return <Landing user={user} />;
