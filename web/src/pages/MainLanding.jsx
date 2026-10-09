@@ -35,6 +35,29 @@ function WindowsMark({ size = 18 }) {
   );
 }
 
+function AppleMark({ size = 18 }) {
+  return (
+    <svg className="os-mark" viewBox="0 0 24 24" width={size} height={size} fill="currentColor" aria-hidden="true">
+      <path d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.28-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.77-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.38-3.69zM14.1 5.84c.63-.77 1.06-1.83.94-2.89-.91.04-2.01.61-2.66 1.37-.58.67-1.1 1.76-.96 2.8 1.01.08 2.05-.52 2.68-1.28z" />
+    </svg>
+  );
+}
+
+function AndroidMark({ size = 18 }) {
+  return (
+    <svg className="os-mark" viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+      <g transform="translate(0 1)">
+        <path
+          fill="currentColor"
+          fillRule="evenodd"
+          d="M4 16a8 8 0 0 1 16 0zM8 12.5a1 1 0 1 0 2 0a1 1 0 1 0-2 0zM14 12.5a1 1 0 1 0 2 0a1 1 0 1 0-2 0z"
+        />
+        <path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M7.6 9.6 5.6 6.2M16.4 9.6l2-3.4" />
+      </g>
+    </svg>
+  );
+}
+
 function storeLabel(className, children) {
   if (!(className || "").includes("landing-btn-store")) return children;
   return (
@@ -141,6 +164,8 @@ export default function MainLanding({ user }) {
   const pageRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [exeUrl, setExeUrl] = useState(DOWNLOAD_URL || "/download");
+  const [macUrl, setMacUrl] = useState("/download/mac");
+  const [androidUrl, setAndroidUrl] = useState("/download/android");
   const [pricing, setPricing] = useState(null);
   const currencyOverride = currencyFromQuery();
 
@@ -169,7 +194,10 @@ export default function MainLanding({ user }) {
       try {
         const data = await api.publicDownload();
         if (!live) return;
-        if (data && data.available) setExeUrl("/download");
+        if (!data) return;
+        setExeUrl(data.available ? "/download" : "");
+        setMacUrl(data.mac || "");
+        setAndroidUrl(data.android || "");
       } catch {
         /* keep siteConfig / empty */
       }
@@ -392,6 +420,12 @@ export default function MainLanding({ user }) {
             <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
               Microsoft Store
             </ExternalCta>
+            <ExternalCta url={macUrl} className="landing-btn landing-btn-ghost landing-btn-lg">
+              <span className="os-marks"><AppleMark /></span><span>macOS</span>
+            </ExternalCta>
+            <ExternalCta url={androidUrl} className="landing-btn landing-btn-ghost landing-btn-lg">
+              <span className="os-marks"><AndroidMark /></span><span>Android</span>
+            </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">
             <li>Windows app</li>
@@ -586,8 +620,8 @@ export default function MainLanding({ user }) {
         </section>
 
         <section className="landing-block landing-dl-block reveal" id="download">
-          <h2>Get PyClips on Windows.</h2>
-          <p className="landing-meta">Windows 10 / Windows 11</p>
+          <h2>Get PyClips.</h2>
+          <p className="landing-meta">Windows 10 / Windows 11 · macOS 14 or later · Android</p>
           <div className="landing-dl">
             <article>
               <span className="landing-dl-ico" aria-hidden="true">
@@ -609,6 +643,26 @@ export default function MainLanding({ user }) {
               <p>Install PyClips from the Microsoft Store on Windows 10 and Windows 11.</p>
               <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store">
                 Microsoft Store
+              </ExternalCta>
+            </article>
+            <article>
+              <span className="landing-dl-ico" aria-hidden="true">
+                <AppleMark size={18} />
+              </span>
+              <h3>macOS</h3>
+              <p>{macUrl ? "Mac installer (.dmg). Click to start the download." : "The Mac installer will be available here when it is released."}</p>
+              <ExternalCta url={macUrl} className="landing-btn landing-btn-primary">
+                <span className="os-marks"><AppleMark /></span><span>macOS</span>
+              </ExternalCta>
+            </article>
+            <article>
+              <span className="landing-dl-ico" aria-hidden="true">
+                <AndroidMark size={18} />
+              </span>
+              <h3>Android</h3>
+              <p>{androidUrl ? "Android app (.apk). Download it on your phone and install it." : "The Android app will be available here when it is released."}</p>
+              <ExternalCta url={androidUrl} className="landing-btn landing-btn-primary">
+                <span className="os-marks"><AndroidMark /></span><span>Android</span>
               </ExternalCta>
             </article>
           </div>
@@ -636,6 +690,12 @@ export default function MainLanding({ user }) {
             </ExternalCta>
             <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
               Microsoft Store
+            </ExternalCta>
+            <ExternalCta url={macUrl} className="landing-btn landing-btn-ghost landing-btn-lg">
+              <span className="os-marks"><AppleMark /></span><span>macOS</span>
+            </ExternalCta>
+            <ExternalCta url={androidUrl} className="landing-btn landing-btn-ghost landing-btn-lg">
+              <span className="os-marks"><AndroidMark /></span><span>Android</span>
             </ExternalCta>
           </div>
         </section>

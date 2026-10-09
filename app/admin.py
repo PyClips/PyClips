@@ -268,6 +268,10 @@ def _filename_from_url(url: str) -> str:
 
 
 def normalize_github_exe_url(raw: str) -> str:
+    return normalize_github_asset_url(raw, (".exe",))
+
+
+def normalize_github_asset_url(raw: str, extensions: tuple[str, ...]) -> str:
     url = (raw or "").strip()
     parsed = urlparse(url)
     host = (parsed.netloc or "").lower()
@@ -284,8 +288,8 @@ def normalize_github_exe_url(raw: str) -> str:
             status_code=400,
             detail="Use a GitHub Releases download URL (https://github.com/.../releases/download/...).",
         )
-    if not path.lower().endswith(".exe"):
-        raise HTTPException(status_code=400, detail="The file must be a .exe.")
+    if not path.lower().endswith(extensions):
+        raise HTTPException(status_code=400, detail=f"The file must be a {' or '.join(extensions)}.")
     return f"https://github.com{path}"
 
 
@@ -330,12 +334,59 @@ def clear_download() -> dict:
     }
 
 
+INSTALLERS = {
+    "mac": {"key": db.MAC_INSTALLER_KEY, "extensions": (".dmg", ".pkg", ".zip"), "public_url": "/download/mac"},
+    "android": {"key": db.ANDROID_APK_KEY, "extensions": (".apk",), "public_url": "/download/android"},
+}
+
+
+def _installer(platform: str) -> dict:
+    spec = INSTALLERS.get(platform)
+    if not spec:
+        raise HTTPException(status_code=404, detail="Unknown platform.")
+    return spec
+
+
+def _installer_payload(platform: str, url: str, updated_at: str) -> dict:
+    name = Path(unquote(urlparse(url).path or "")).name if url else ""
+    return {"url": url, "filename": name, "updated_at": updated_at, "public_url": _installer(platform)["public_url"]}
+
+
+def get_installer(platform: str) -> dict:
+    row = db.get_setting(_installer(platform)["key"])
+    url = ((row or {}).get("value") or "").strip()
+    return _installer_payload(platform, url, (row or {}).get("updated_at") or "" if url else "")
+
+
+def set_installer(platform: str, body: SetDownloadBody) -> dict:
+    spec = _installer(platform)
+    url = normalize_github_asset_url(body.url, spec["extensions"])
+    saved = db.set_setting(spec["key"], url)
+    logger.info("%s download URL set to %s", platform, url)
+    return _installer_payload(platform, url, saved["updated_at"])
+
+
+def clear_installer(platform: str) -> dict:
+    db.delete_setting(_installer(platform)["key"])
+    return _installer_payload(platform, "", "")
+
+
+def installer_target(platform: str) -> str:
+    row = db.get_setting(_installer(platform)["key"])
+    url = ((row or {}).get("value") or "").strip()
+    if not url:
+        raise HTTPException(status_code=404, detail="Download is not available yet.")
+    return url
+
+
 def public_download() -> dict:
     row = db.get_setting(db.WINDOWS_EXE_KEY)
     url = (row or {}).get("value") or ""
-    if not url.strip():
-        return {"available": False, "url": ""}
-    return {"available": True, "url": "/download"}
+    out = {"available": bool(url.strip()), "url": "/download" if url.strip() else ""}
+    for platform, spec in INSTALLERS.items():
+        saved = ((db.get_setting(spec["key"]) or {}).get("value") or "").strip()
+        out[platform] = spec["public_url"] if saved else ""
+    return out
 
 
 def windows_exe_target() -> str:

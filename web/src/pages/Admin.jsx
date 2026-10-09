@@ -59,6 +59,101 @@ function TabButton({ id, tab, setTab, setMsg, children }) {
   );
 }
 
+function InstallerCard({ platform, title, fileHint, placeholder }) {
+  const [url, setUrl] = useState("");
+  const [meta, setMeta] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [ok, setOk] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    api.adminInstaller(platform)
+      .then((data) => {
+        if (!live) return;
+        setMeta(data);
+        setUrl(data.url || "");
+      })
+      .catch(() => {});
+    return () => { live = false; };
+  }, [platform]);
+
+  async function save(e) {
+    e.preventDefault();
+    setMsg("");
+    setBusy(true);
+    try {
+      const data = await api.adminSetInstaller(platform, url.trim());
+      setMeta(data);
+      setUrl(data.url || "");
+      setOk(true);
+      setMsg(`${title} button is live on the landing page.`);
+    } catch (err) {
+      setOk(false);
+      setMsg(err.message || "Could not save that download URL.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function clear() {
+    if (!window.confirm(`Remove the ${title} download link? The button will show Coming soon until you save a new URL.`)) {
+      return;
+    }
+    setMsg("");
+    setBusy(true);
+    try {
+      const data = await api.adminClearInstaller(platform);
+      setMeta(data);
+      setUrl("");
+    } catch (err) {
+      setOk(false);
+      setMsg(err.message || "Could not clear the download URL.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const publicUrl = meta?.public_url || `/download/${platform}`;
+  return (
+    <div className="card">
+      <h2>{title}</h2>
+      <p className="note">
+        On GitHub: Releases → attach <code>{fileHint}</code> → copy the asset URL
+        (<code>https://github.com/…/releases/download/…/{fileHint}</code>).
+      </p>
+      <form className="auth-form" onSubmit={save}>
+        <label className="auth-label">
+          GitHub Releases URL
+          <input
+            className="auth-input"
+            type="url"
+            placeholder={placeholder}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            required
+          />
+        </label>
+        {msg && <p className={ok ? "note ok" : "error"}>{msg}</p>}
+        <SurfaceFrame variant="primary" full>
+          <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? "Saving…" : "Save and publish"}</button>
+        </SurfaceFrame>
+      </form>
+      {meta?.url ? (
+        <div style={{ marginTop: 16 }}>
+          <p className="note ok">Live: {meta.filename || title}</p>
+          <p className="note"><a href={publicUrl}>pyclips.in{publicUrl}</a> redirects to that file.</p>
+          <SurfaceFrame variant="ghost" size="sm">
+            <button type="button" className="btn btn-ghost" disabled={busy} onClick={clear}>Clear</button>
+          </SurfaceFrame>
+        </div>
+      ) : (
+        <p className="note" style={{ marginTop: 16 }}>No installer linked. Landing shows Coming soon.</p>
+      )}
+    </div>
+  );
+}
+
 export default function Admin() {
   const [gate, setGate] = useState("checking");
   const [tab, setTab] = useState("overview");
@@ -576,7 +671,7 @@ export default function Admin() {
       {tab === "download" && (
         <>
           <h1 className="landing-title">Download</h1>
-          <p className="landing-sub">Paste the GitHub Releases .exe URL. Landing “Download PyClips” buttons then start that download.</p>
+          <p className="landing-sub">Paste GitHub Releases URLs for Windows (.exe), macOS (.dmg) and Android (.apk). The matching landing buttons then start that download.</p>
           {storage?.ephemeral && (
             <p className="error">
               This link is stored on a temporary disk. Attach a Railway volume at <code>/data</code> or it will vanish on the next deploy.
@@ -618,6 +713,18 @@ export default function Admin() {
               <p className="note" style={{ marginTop: 16 }}>No installer linked. Landing shows Coming soon.</p>
             )}
           </div>
+          <InstallerCard
+            platform="mac"
+            title="macOS installer"
+            fileHint="PyClips-….dmg"
+            placeholder="https://github.com/PyClips/PyClips/releases/download/mac-1.0.0/PyClips-1.0.0.dmg"
+          />
+          <InstallerCard
+            platform="android"
+            title="Android app"
+            fileHint="PyClips-….apk"
+            placeholder="https://github.com/PyClips/PyClips/releases/download/android-0.3.0/PyClips-0.3.0.apk"
+          />
           <LegalFooter />
         </>
       )}

@@ -224,6 +224,29 @@ def download_windows():
     return RedirectResponse(url=url, status_code=302)
 
 
+@app.get("/api/admin/installer/{platform}")
+def admin_get_installer(platform: str, request: Request) -> dict:
+    admin.require_admin(request)
+    return admin.get_installer(platform)
+
+
+@app.post("/api/admin/installer/{platform}")
+def admin_set_installer(platform: str, request: Request, body: admin.SetDownloadBody) -> dict:
+    admin.require_admin(request)
+    return admin.set_installer(platform, body)
+
+
+@app.post("/api/admin/installer/{platform}/clear")
+def admin_clear_installer(platform: str, request: Request) -> dict:
+    admin.require_admin(request)
+    return admin.clear_installer(platform)
+
+
+@app.get("/download/{platform}")
+def download_installer(platform: str):
+    return RedirectResponse(url=admin.installer_target(platform), status_code=302)
+
+
 @app.post("/api/billing/webhook")
 async def webhook(request: Request) -> dict:
     raw = await request.body()

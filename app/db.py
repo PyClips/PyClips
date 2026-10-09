@@ -273,6 +273,8 @@ def save_coupons(data: dict) -> None:
 
 
 WINDOWS_EXE_KEY = "windows_exe_url"
+MAC_INSTALLER_KEY = "mac_installer_url"
+ANDROID_APK_KEY = "android_apk_url"
 DOWNLOAD_HITS_KEY = "windows_download_hits"
 
 
