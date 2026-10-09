@@ -27,6 +27,14 @@ function MicrosoftMark({ size = 18 }) {
   );
 }
 
+function WindowsMark({ size = 18 }) {
+  return (
+    <svg className="os-mark" viewBox="0 0 24 24" width={size} height={size} fill="currentColor" aria-hidden="true">
+      <path d="M2 4.3 10 3.2v7.7H2zM11 3.1 22 1.5v9.4H11zM2 12h8v7.8L2 18.7zM11 12h11v9.5L11 20z" />
+    </svg>
+  );
+}
+
 function storeLabel(className, children) {
   if (!(className || "").includes("landing-btn-store")) return children;
   return (
@@ -132,7 +140,7 @@ function currencyFromQuery() {
 export default function MainLanding({ user }) {
   const pageRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [exeUrl, setExeUrl] = useState(DOWNLOAD_URL || "");
+  const [exeUrl, setExeUrl] = useState(DOWNLOAD_URL || "/download");
   const [pricing, setPricing] = useState(null);
   const currencyOverride = currencyFromQuery();
 
@@ -379,7 +387,7 @@ export default function MainLanding({ user }) {
           </p>
           <div className="landing-hero-ctas">
             <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary landing-btn-lg">
-              Download PyClips
+              <span className="os-marks"><WindowsMark /></span><span>Download PyClips</span>
             </ExternalCta>
             <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
               Microsoft Store
@@ -549,7 +557,7 @@ export default function MainLanding({ user }) {
               </ul>
               <p className="landing-note">Deleting a clip does not restore a slot.</p>
               <ExternalCta url={exeUrl} className="landing-btn landing-btn-ghost landing-btn-full">
-                Download PyClips
+                <span className="os-marks"><WindowsMark /></span><span>Download PyClips</span>
               </ExternalCta>
             </article>
             <article className="landing-plan landing-plan-hi">
@@ -590,7 +598,7 @@ export default function MainLanding({ user }) {
               <h3>Direct download</h3>
               <p>{exeUrl ? "Windows installer (.exe). Click to start the download." : "The Windows installer will be available here when it is released."}</p>
               <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary">
-                Download PyClips
+                <span className="os-marks"><WindowsMark /></span><span>Download PyClips</span>
               </ExternalCta>
             </article>
             <article>
@@ -624,7 +632,7 @@ export default function MainLanding({ user }) {
           <p>Turn your long-form videos into polished short-form content with PyClips.</p>
           <div className="landing-hero-ctas">
             <ExternalCta url={exeUrl} className="landing-btn landing-btn-primary landing-btn-lg">
-              Download PyClips
+              <span className="os-marks"><WindowsMark /></span><span>Download PyClips</span>
             </ExternalCta>
             <ExternalCta url={MICROSOFT_STORE_URL} className="landing-btn landing-btn-store landing-btn-lg">
               Microsoft Store
