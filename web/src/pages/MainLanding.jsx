@@ -115,11 +115,15 @@ function Shot({ src, alt, eager = false }) {
 const FAQS = [
   {
     q: "What is PyClips?",
-    a: "PyClips is a Windows desktop app that turns videos into captioned short-form clips. Import, set up the clip, pick a soundtrack, style captions, then bake and export MP4s.",
+    a: "PyClips is a clip studio for Windows, Mac and Android that turns videos into captioned short-form clips. Import, set up the clip, pick a soundtrack, style captions, then bake and export MP4s.",
   },
   {
     q: "How do I install PyClips?",
-    a: "Get PyClips from the Microsoft Store on Windows 10 or Windows 11. A direct Windows installer is also offered on this site when it is available.",
+    a: "On Windows 10 or Windows 11, get PyClips from the Microsoft Store or use the direct Windows installer on this site. On Mac, PyClips runs on macOS 14 Sonoma or newer, on Apple Silicon and Intel Macs: open the .dmg, drag PyClips to Applications, and approve it once in System Settings → Privacy & Security. On Android 8.0 or newer, download the PyClips .apk from this site on your phone and allow installs from your browser when Android asks. PyClips is not on Google Play yet.",
+  },
+  {
+    q: "What can the Android app do?",
+    a: "The same import, caption, style and export flow, right on your phone. Videos can be up to 10 minutes long, and each run makes up to 10 clips. Longer videos and bigger batches stay on Windows and Mac.",
   },
   {
     q: "Can I use my own videos?",
@@ -135,11 +139,11 @@ const FAQS = [
   },
   {
     q: "Does PyClips use my GPU?",
-    a: "When a compatible NVIDIA GPU is available, PyClips can use GPU acceleration for processing. CPU processing remains available otherwise.",
+    a: "On Windows, when a compatible NVIDIA GPU is available, PyClips can use GPU acceleration for processing. CPU processing remains available otherwise. On Mac, PyClips processes on the CPU. On Android, PyClips works on the phone itself.",
   },
   {
     q: "Where are my exported clips saved?",
-    a: "Finished clips are saved to your PyClips Downloads folder.",
+    a: "On Windows, finished clips are saved to your PyClips Downloads folder. On Mac, they go to Movies → PyClips. On Android, they go to Movies/PyClips and show up in your Gallery.",
   },
   {
     q: "Is there a free version?",
@@ -147,7 +151,7 @@ const FAQS = [
   },
   {
     q: "How does Premium work?",
-    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹99 / month or ₹599 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited bakes and premium features in the desktop app after you sign in with the same account.",
+    a: "Premium is purchased on this website through Razorpay. India pays in INR (₹99 / month or ₹599 / year). Outside India, Razorpay International charges in USD ($2.99 / month or $29.99 / year). It unlocks unlimited bakes and premium features in PyClips on Windows, Mac and Android after you sign in with the same account.",
   },
   {
     q: "Can I use PyClips without Premium?",
@@ -343,7 +347,7 @@ export default function MainLanding({ user }) {
   const isUsd = (pricing?.currency || currencyOverride) === "USD";
   const monthlyPrice = pricing?.monthly_display || (isUsd ? "$2.99" : "₹99");
   const yearlyPrice = pricing?.yearly_display || (isUsd ? "$29.99" : "₹599");
-  const currencyHref = `/?currency=${isUsd ? "INR" : "USD"}#pricing`;
+  const currencyHref = `/pyclips?currency=${isUsd ? "INR" : "USD"}#pricing`;
   const payHref = `/pay?currency=${isUsd ? "USD" : "INR"}`;
 
   return (
@@ -403,7 +407,7 @@ export default function MainLanding({ user }) {
 
       <main>
         <section className="landing-hero">
-          <p className="landing-eyebrow">Windows desktop clip studio</p>
+          <p className="landing-eyebrow">Clip studio for Windows, Mac &amp; Android</p>
           <h1>
             Turn long videos into
             <br />
@@ -428,7 +432,7 @@ export default function MainLanding({ user }) {
             </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">
-            <li>Windows app</li>
+            <li>Windows, Mac &amp; Android</li>
             <li>Styled captions</li>
             <li>GPU optional</li>
             <li>20 free clips</li>
@@ -554,7 +558,7 @@ export default function MainLanding({ user }) {
 
         <section className="landing-block landing-flow-block reveal">
           <h2>One workflow. No editing headache.</h2>
-          <p className="landing-subhead">Import, clip setup, soundtrack, captions, style, review, and export from one Windows app.</p>
+          <p className="landing-subhead">Import, clip setup, soundtrack, captions, style, review, and export from one app on Windows, Mac or Android.</p>
           <ol className="landing-flow">
             <li>Import</li>
             <li>Clip</li>
@@ -670,7 +674,7 @@ export default function MainLanding({ user }) {
 
         <section className="landing-block landing-faq-block reveal" id="faq">
           <h2>Frequently asked questions</h2>
-          <p className="landing-subhead">How PyClips works on Windows, billing, and the free tier.</p>
+          <p className="landing-subhead">How PyClips works on Windows, Mac and Android, billing, and the free tier.</p>
           <div className="landing-faq">
             {FAQS.map((item) => (
               <details key={item.q} className="landing-faq-item">
@@ -706,7 +710,7 @@ export default function MainLanding({ user }) {
           <span className="landing-mark sm"><Bolt size={16} /></span>
           <div>
             <strong>PyClips</strong>
-            <p>AI-powered video clipping for Windows.</p>
+            <p>AI-powered video clipping for Windows, Mac and Android.</p>
           </div>
         </div>
         <nav aria-label="Footer">
