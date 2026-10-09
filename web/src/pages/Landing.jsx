@@ -56,6 +56,21 @@ function AppleMark({ size = 18 }) {
   );
 }
 
+function AndroidMark({ size = 18 }) {
+  return (
+    <svg className="os-mark" viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+      <g transform="translate(0 1)">
+        <path
+          fill="currentColor"
+          fillRule="evenodd"
+          d="M4 16a8 8 0 0 1 16 0zM8 12.5a1 1 0 1 0 2 0a1 1 0 1 0-2 0zM14 12.5a1 1 0 1 0 2 0a1 1 0 1 0-2 0z"
+        />
+        <path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M7.6 9.6 5.6 6.2M16.4 9.6l2-3.4" />
+      </g>
+    </svg>
+  );
+}
+
 function storeLabel(className, children) {
   if (!(className || "").includes("landing-btn-store")) return children;
   return (
@@ -419,10 +434,10 @@ export default function Landing({ user }) {
               </ExternalCta>
             )}
             <ExternalCta url={checkoutUrl(SYSTEME_MONTHLY_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
-              <span className="os-marks"><WindowsMark /><AppleMark /></span><span>PyClips Monthly</span>
+              <span className="os-marks"><WindowsMark /><AppleMark /><AndroidMark /></span><span>PyClips Monthly</span>
             </ExternalCta>
             <ExternalCta url={checkoutUrl(SYSTEME_LIFETIME_URL)} className="landing-btn landing-btn-primary landing-btn-lg">
-              <span className="os-marks"><WindowsMark /><AppleMark /></span><span>PyClips Lifetime</span>
+              <span className="os-marks"><WindowsMark /><AppleMark /><AndroidMark /></span><span>PyClips Lifetime</span>
             </ExternalCta>
           </div>
           <ul className="landing-trust" aria-label="Product highlights">
